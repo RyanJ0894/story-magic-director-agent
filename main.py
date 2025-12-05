@@ -9,6 +9,7 @@ from typing import Dict, List, Any, Optional
 import time
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from pydantic import BaseModel, Field
+from fastapi.middleware.cors import CORSMiddleware
 
 # --- Import your custom modules ---
 # Ensure these are in your python path
@@ -26,6 +27,14 @@ app = FastAPI(
     description="API to generate director scenes and audio metadata from scripts using GenAI.",
     version="1.0.0"
 )
+
+app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
 # --- Pydantic Models ---
 class DirectorRequest(BaseModel):

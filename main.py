@@ -196,7 +196,7 @@ async def generate_director_scenes_endpoint(request: DirectorRequest):
         # 3. Save to Supabase
         # Assuming save_to_supabase returns the saved object or confirmation
         saved_record = await save_to_supabase(request.project_id, director_data)
-        end_time = 0
+        end_time = time.time()
         processing_time = round(end_time - start_time, 2)
 
         return DirectorResponse(

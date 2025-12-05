@@ -1,0 +1,18 @@
+{
+  "model_name": "all-MiniLM-L6-v2",
+  "audio_type": "sfx",
+  "num_items": 53,
+  "embedding_dim": 384,
+  "text_fields": [
+    "group",
+    "mood",
+    "style",
+    "tags"
+  ],
+  "filter_fields": [
+    "group",
+    "style",
+    "intensity",
+    "loopable"
+  ]
+}

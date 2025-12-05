@@ -1,0 +1,19 @@
+{
+  "model_name": "all-MiniLM-L6-v2",
+  "audio_type": "music",
+  "num_items": 39,
+  "embedding_dim": 384,
+  "text_fields": [
+    "title",
+    "group",
+    "mood",
+    "style",
+    "tags"
+  ],
+  "filter_fields": [
+    "group",
+    "style",
+    "intensity",
+    "loopable"
+  ]
+}

@@ -445,7 +445,7 @@ audio_director_agent = LlmAgent(
     name="AudioDirectorAgent",
     model=DEFAULT_MODEL,
     instruction=AUDIO_DIRECTOR_PROMPT,
-    description="Analyzes Director JSON and selects precisely-matched music, ambience, and SFX for scenes",
+    description="Analyzes Director JSON and selects precisely-matched music, ambience, and SFX for scenes  and always return a valid json",
     tools=[
         search_music_tool,
         search_ambience_tool,

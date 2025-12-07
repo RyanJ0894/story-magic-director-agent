@@ -242,18 +242,17 @@ director_agent = LlmAgent(
     name="DirectorAgent",
     model=DEFAULT_MODEL,
     instruction=DIRECTOR_DIRECT_PROMPT,
-    description="Converts scripts to Director JSON with consistent character naming, expanded abbreviations, and removed parentheticals for audio playback",
+    description="Converts scripts to Director JSON with consistent character naming, expanded abbreviations, and removed parentheticals for audio playback, always return a valid json",
     tools=[
         search_voices_tool
     ],
     output_key="director_json"
 )
 
-code_pipeline_agent = SequentialAgent(
+root_agent = SequentialAgent(
     name="Director_Sequence_Agent",
     sub_agents=[director_agent, audio_director_agent],
     description="Executes a sequence of director_agent, audio_director_agent.",
 )
 
 # For ADK tools compatibility, the root agent must be named `root_agent`
-root_agent = code_pipeline_agent

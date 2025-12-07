@@ -147,12 +147,32 @@ async def get_director_json(project_id: str, script_text: str, agent: Any) -> Di
         session_id=session_id
     )
     
+    # In your get_director_json function, after getting the session:
+    if session:
+        logger.info(f"Session state keys: {session.state.keys() if session.state else 'No state'}")
+        logger.info(f"Full session state: {session.state}")
+        
     # 7. Extract and Parse
     data = {}
     if session:
         try:
-            director_str = session.state.get("director_json")
-            audio_str = session.state.get("scene_audio_json")
+            
+            logger.info(f"Full session state: {json.dumps(session.state, default=str)}")
+        
+            # Try different access patterns
+            director_str = (
+                session.state.get("director_json") or 
+                session.state.get("DirectorAgent", {}).get("output") or
+                session.state.get("output", {}).get("director_json")
+            )
+            audio_str = (
+                session.state.get("scene_audio_json") or
+                session.state.get("AudioDirectorAgent", {}).get("output") or
+                session.state.get("output", {}).get("scene_audio_json")
+            )
+            
+            # director_str = session.state.get("director_json")
+            # audio_str = session.state.get("scene_audio_json")
             
             if not director_str or not audio_str:
                 raise ValueError("Agent completed but output state keys are empty.")

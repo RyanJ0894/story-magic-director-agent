@@ -232,13 +232,6 @@
   },
   {
     "label": "Male 20s to 30s",
-    "voice_id": "Yy9hdn23JDNfhVPIWlHY",
-    "gender": "Male",
-    "tone": "Casual",
-    "style": "American"
-  },
-  {
-    "label": "Male 20s to 30s",
     "voice_id": "1RVpBInY9YUYMLSUQReV",
     "gender": "Male",
     "tone": "Calm",
@@ -404,13 +397,6 @@
     "gender": "Female",
     "tone": "Smooth",
     "style": "British"
-  },
-  {
-    "label": "Narrator",
-    "voice_id": "e5WNhrdI30aXpS2RSGm1",
-    "gender": "Male",
-    "tone": "Deep",
-    "style": "American"
   },
   {
     "label": "Narrator",

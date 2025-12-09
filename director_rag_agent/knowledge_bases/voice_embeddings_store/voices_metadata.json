@@ -113,13 +113,6 @@
   },
   {
     "label": "Female - 20s to 30s",
-    "voice_id": "4D9Pkpgb8u9YXb1E2jKB",
-    "gender": "Female",
-    "tone": "Southern",
-    "style": "African American"
-  },
-  {
-    "label": "Female - 20s to 30s",
     "voice_id": "LElbsnORyWdRipDG9D4D",
     "gender": "Female",
     "tone": "Southern",
@@ -228,13 +221,6 @@
     "voice_id": "TkSyBjII8TcWww0CSouI",
     "gender": "Female",
     "tone": "soft",
-    "style": "American"
-  },
-  {
-    "label": "Male 20s to 30s",
-    "voice_id": "PSqRw3ln34TxQZrTS6Wt",
-    "gender": "Male",
-    "tone": "Energetic",
     "style": "American"
   },
   {
@@ -400,13 +386,6 @@
   },
   {
     "label": "Narrator",
-    "voice_id": "XjLkpWUlnhS8i7gGz3lZ",
-    "gender": "Male",
-    "tone": "Clear and Crisp",
-    "style": "American"
-  },
-  {
-    "label": "Narrator",
     "voice_id": "AeRdCCKzvd23BpJoofzx",
     "gender": "Male",
     "tone": "Calm",
@@ -488,13 +467,6 @@
     "gender": "Female",
     "tone": "wise",
     "style": "American"
-  },
-  {
-    "label": "Older Female",
-    "voice_id": "4eC0mcIIjlMstsKu8fMF",
-    "gender": "Female",
-    "tone": "comforting",
-    "style": "African American"
   },
   {
     "label": "Older Female",

@@ -90,6 +90,25 @@ INPUT: {{"project_id": "xxx", "script_text": "..."}}
 2. For revealed characters, search for the voice using their REVEALED identity
 3. Use the SAME voice_key for all lines from the same character
 
+**VOICE ASSIGNMENT RULES (CRITICAL):**
+
+1. **AGE MATCHING:**
+   - Character age 13-19 → MUST use label="Male Teen" or "Female Teen"
+   - Character age 20-39 → Use label="Male 20s to 30s" or "Female - 20s to 30s"
+   - Character age 40+ → Use label="Older Male" or "Older Female"
+   - Child under 13 → Use label="Male Under 10" or "Female Under 10"
+
+2. **ACCENT ASSIGNMENT:**
+   - **DEFAULT**: Use style="American" for all characters UNLESS:
+   - Script explicitly mentions foreign country/accent (e.g., "British man", "from London", "Irish accent")
+   - Only then use style="British", "Irish", etc.
+   - **DO NOT** assign foreign accents to generic characters
+
+3. **NARRATOR VOICES:**
+   - Can be ANY voice with label="Narrator"
+   - No accent restrictions for narrators
+   - Choose based on tone and delivery style only
+
 ### PHASE 2: SCENE PARSING & JSON CONSTRUCTION
 
 Generate the JSON output with these **Strict Parsing Rules**:
@@ -214,9 +233,14 @@ Output text: "Interior/Exterior. Israel. United States Army Base. Medical Tent. 
 
 **Voice Matching Strategy:**
 1. For narrators: Use label="Narrator" or search "narrator documentary"
+   - **NARRATOR EXCEPTION**: Narrator voices can be ANY narrator in catalog (no accent restrictions)
 2. For character age: Match label to character age
+   - **TEEN RULE**: If character is described as age 13-19, MUST use label="Male Teen" or label="Female Teen"
 3. For personality: Combine query + tone filter
 4. For regional characters: Use style filter
+   - **FOREIGN ACCENT RULE**: Foreign non-USA accents (British, Irish, Australian, etc.) should ONLY be assigned if the character description SPECIFICALLY mentions that accent or country
+   - Example: Only use style="British" if script says "British accent" or "from London" or "Englishman"
+   - Do NOT assign British/foreign voices to generic American characters
 
 ### FINAL CHECKLIST BEFORE OUTPUT
 

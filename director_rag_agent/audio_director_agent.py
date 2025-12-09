@@ -220,6 +220,12 @@ PHASE 2: AUDIO SELECTION RULES (STRICT MATCHING)
 
 ### 2.1 MUSIC SELECTION RULES
 
+**SCENE LENGTH RULE (CHECK THIS FIRST):**
+- Before selecting ANY music, count the total words in the scene (all dialogue + action text combined)
+- **If scene has LESS than 250 words → DO NOT ADD MUSIC** (set music array to empty: `"music": []`)
+- **If scene has 250+ words → Proceed with music selection**
+- NOT ALL SCENES REQUIRE MUSIC - only add if it enhances the scene
+
 **MOOD-TO-GROUP MAPPING (Use this exact mapping):**
 
 | Scene Mood/Situation | Music Group | When to Use |
@@ -239,6 +245,13 @@ PHASE 2: AUDIO SELECTION RULES (STRICT MATCHING)
 - Low intensity scenes (quiet dialogue, reflection): Choose tracks with intensity 40-55
 - Medium intensity (building tension, moderate action): Choose tracks with intensity 55-70
 - High intensity (action peaks, emotional climax): Choose tracks with intensity 70-85
+
+**MUSIC PLACEMENT & VOLUME:**
+- Music should begin at LOW volume from the start of the scene
+- Gradually increase volume throughout the scene
+- Maximum volume should be SIGNIFICANTLY LOWER than dialogue voices
+- The orchestrator will handle final volume mixing (voices always loudest)
+- Music provides emotional support but should never overpower dialogue
 
 **STYLE CONSIDERATION:**
 - Period pieces → orchestral strings, piano
@@ -265,6 +278,17 @@ PHASE 2: AUDIO SELECTION RULES (STRICT MATCHING)
 | War zone, combat | Battlefield / War Zones | Gunfire, explosions |
 | Inside car (moving) | Vehicles Ambience | Engine, road noise |
 | Crowd/event | Big Crowds, Small Crowds | Based on crowd size |
+
+**AMBIENCE DURATION & LOOPING RULES:**
+- If ambience describes the OVERALL scene environment (e.g., "city street", "forest", "office"), it should play for the ENTIRE scene
+- If the ambience audio track is shorter than the scene duration, mark it to loop: Add parameter `"loop": true`
+- Scene-specific ambience (describing overall setup) gets `"loop": true`
+- Short ambience for specific moments (e.g., "brief wind gust") gets `"loop": false`
+
+**SCENE BOUNDARY RULES:**
+- Ambience and SFX MUST STOP at scene end markers: CUT TO:, DISSOLVE TO:, FLASHBACK TO:, BACK TO:
+- Do NOT carry ambience from one scene into the next
+- Each scene gets its own fresh ambience selection
 
 **WEATHER OVERLAY:**
 - Rain mentioned → Add Rain or Storm group
@@ -294,10 +318,22 @@ PHASE 2: AUDIO SELECTION RULES (STRICT MATCHING)
 | crash, collision, impact | Cars, Demolition | HIGH |
 | water, splash, drip | Water | LOW |
 
-**SFX TIMING RULES:**
-- SFX must be tied to a specific `line_id` where the action occurs
+**SFX TIMING & DURATION RULES:**
+- SFX must be tied to a specific `line_id` where the action occurs or is mentioned
+- The SFX will play at the exact moment that line is heard in the audio playback
 - If action spans multiple lines, use the FIRST line where it begins
-- Duration should match the action length (short impact=2-3s, sustained=5-10s)
+- **Duration Guidelines:**
+  - Short impacts (gunshot, door slam, glass break): `"duration": 2` (2 seconds)
+  - Medium actions (footsteps, phone ring): `"duration": 5` (5 seconds)  
+  - Sustained sounds (car engine, alarm): `"duration": 10` (10 seconds)
+- If the SFX audio clip itself is shorter than these durations, that's fine - use the clip's natural length
+- Minimum play time: 2 seconds, Maximum: 10 seconds (unless clip is naturally shorter/longer)
+
+**SFX VOLUME HIERARCHY:**
+- Dialogue voices are ALWAYS loudest in the mix
+- SFX should be clearly audible but never overpower voices
+- The orchestrator will handle final volume balancing
+- Select impactful SFX that support the action without dominating
 
 ═══════════════════════════════════════════════════════════════════════════════
 PHASE 3: SEARCH STRATEGY
@@ -356,6 +392,15 @@ PHASE 4: OUTPUT GENERATION
 
 ### 4.1 JSON OUTPUT STRUCTURE
 
+**IMPORTANT - VOLUME HIERARCHY:**
+All volume balancing is handled by the orchestrator with this hierarchy:
+1. **Dialogue Voices** = Loudest (0dB baseline)
+2. **SFX** = Lower than voices (support action)
+3. **Ambience** = Lower than SFX (background environment)
+4. **Music** = Lowest (emotional underscore)
+
+Your job is to select appropriate audio; the orchestrator ensures voices always stay upfront.
+
 ```json
 {
   "project_id": "xxx",
@@ -411,7 +456,10 @@ For each scene, follow this exact sequence:
 □ 4. Identify the PRIMARY mood (pick ONE dominant mood)
 □ 5. Map mood → Music Group using the table above
 □ 6. Map location → Ambience Group using the table above
-□ 7. Scan for action trigger words → list SFX needs (max 3)
+□ 7. Scan for action trigger words → list ALL potential SFX matches (prioritize top 3 most impactful)
+     - Read EVERY line of dialogue and action text
+     - Match trigger words from the ACTION-TO-SFX table
+     - Identify ALL matches, then select the 3 most important/impactful sounds
 □ 8. Execute searches with specific parameters
 □ 9. Select best matches from results - Document selection reason
 □ 10. Output valid JSON

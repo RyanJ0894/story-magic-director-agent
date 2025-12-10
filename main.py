@@ -653,11 +653,7 @@ async def generate_director_scenes_endpoint(request: DirectorRequest):
         if not is_valid:
             logger.warning(f"Voice consistency warnings for {request.project_id}: {warnings}")
 
-        # 3. Save to Supabase
-        print("******************************************************")
-        print(director_data)
-        print("******************************************************")
-        
+        # save to supabase
         saved_record = await save_to_supabase(request.project_id, director_data)
         
         end_time = time.time()

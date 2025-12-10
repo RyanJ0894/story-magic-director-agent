@@ -260,13 +260,6 @@
   },
   {
     "label": "Male 20s to 30s",
-    "voice_id": "Tm4QO7PzRBQqp7MSSl5w",
-    "gender": "Male",
-    "tone": "Southern",
-    "style": "American"
-  },
-  {
-    "label": "Male 20s to 30s",
     "voice_id": "k1SgXRmVVqpFcQpNU1ou",
     "gender": "Male",
     "tone": "raspy",

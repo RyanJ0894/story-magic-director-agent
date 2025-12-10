@@ -7,6 +7,7 @@ from typing import Optional
 from pydantic import BaseModel, Field
 search_voices_tool = FunctionTool(search_voices)
 from google.adk.agents import SequentialAgent
+from google.adk.models.lite_llm import LiteLlm
 
 from .audio_director_agent import audio_director_agent
 
@@ -262,9 +263,13 @@ Before generating JSON, verify:
 5. Output VALID JSON only
 """
 
+groq_model = LiteLlm(
+  model='groq/llama-3.3-70b-versatile'
+)
+
 director_agent = LlmAgent(
     name="DirectorAgent",
-    model=DEFAULT_MODEL,
+    model=groq_model,
     instruction=DIRECTOR_DIRECT_PROMPT,
     description="Converts scripts to Director JSON with consistent character naming, expanded abbreviations, and removed parentheticals for audio playback, always return a valid json",
     tools=[

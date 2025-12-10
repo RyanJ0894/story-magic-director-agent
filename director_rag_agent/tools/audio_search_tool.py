@@ -190,6 +190,17 @@ def search_sfx(
             "loopable": true
         }
     """
+    GROUP_ALIASES = {
+        "Human": "Body",
+        "People": "Body", 
+        "Voice": "Body",
+        "Gunshots": "Weapons",
+        "Guns": "Weapons",
+    }
+    
+    if group and group in GROUP_ALIASES:
+        group = GROUP_ALIASES[group]
+        
     intensity = None
     if intensity_min is not None or intensity_max is not None:
         intensity = (intensity_min or 0, intensity_max or 100)

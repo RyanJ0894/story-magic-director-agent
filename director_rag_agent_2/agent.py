@@ -266,9 +266,59 @@ Output text: "Interior/Exterior. Israel. United States Army Base. Medical Tent. 
 
 **Voice Matching Strategy:**
 1. For narrators: Use label="Narrator" or search "narrator documentary"
+   - **NARRATOR EXCEPTION**: Narrator voices can be ANY narrator in catalog (no accent restrictions)
 2. For character age: Match label to character age
+   - **TEEN RULE**: If character is described as age 13-19, MUST use label="Male Teen" or label="Female Teen"
 3. For personality: Combine query + tone filter
 4. For regional characters: Use style filter
+
+**VOICE ASSIGNMENT RULES (CRITICAL - MUST FOLLOW):**
+
+**RACE/ETHNICITY MATCHING (HIGHEST PRIORITY):**
+- **African American character** → MUST include style="African American" in search_voices call
+- **Black character** → MUST include style="African American" in search_voices call
+- **Caucasian/White character** → MUST include style="American" in search_voices call
+- **Hispanic/Latino character** → MUST include style="Hispanic American" in search_voices call
+- **British character** → Use style="British" ONLY if script explicitly says "British", "English", "from London", etc.
+- **Southern character** → Use style="Southern American" ONLY if script mentions Southern accent/region
+- **IF NO RACE/ETHNICITY MENTIONED** → Default to style="American"
+
+**IMPORTANT**: 
+- Race/ethnicity matching takes ABSOLUTE PRIORITY over all other filters
+- "American" in style metadata = Caucasian/White by default
+- Always check character description for racial/ethnic identifiers FIRST before any other matching
+
+**AGE MATCHING:**
+- Character age 13-19 → MUST use label="Male Teen" or "Female Teen"
+- Character age 20-39 → Use label="Male 20s to 30s" or "Female - 20s to 30s"
+- Character age 40+ → Use label="Older Male" or "Older Female"
+- Child under 13 → Use label="Male Under 10" or "Female Under 10"
+
+**SEARCH EXAMPLE FOR AFRICAN AMERICAN CHARACTER:**
+```
+search_voices(
+    query="confident strong man",
+    gender="Male",
+    style="African American",  # REQUIRED for African American character
+    label="Male 20s to 30s"
+)
+```
+
+**SEARCH EXAMPLE FOR CAUCASIAN CHARACTER:**
+```
+search_voices(
+    query="warm friendly woman",
+    gender="Female",
+    style="American",  # "American" = Caucasian default
+    label="Female - 20s to 30s"
+)
+```
+
+**VOICE SELECTION RANDOMIZATION:**
+- When multiple voices match the criteria, randomly select ONE from the top 3-5 matches
+- DO NOT always pick the first/top result
+- Use variety - if processing the same script multiple times, select different matching voices each time
+- This ensures fresh casting choices while maintaining character appropriateness
 
 ### FINAL CHECKLIST BEFORE OUTPUT
 

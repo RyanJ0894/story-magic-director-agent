@@ -111,6 +111,33 @@ PHASE 2: AUDIO SELECTION RULES (STRICT MATCHING)
 
 ### 2.3 SFX SELECTION RULES
 
+**CRITICAL - STRICT MATCHING ONLY:**
+
+Only select SFX when there is a DIRECT, EXPLICIT match between a specific action word in the script text and a corresponding sound in our SFX catalog.
+
+**FORBIDDEN - Do NOT add SFX for:**
+- Implied or inferred actions not explicitly written in the script
+- General mood or atmosphere (that's what ambience is for)
+- Actions that "might" happen based on context
+- Creative interpretation of what "could" be happening
+- Actions mentioned in dialogue but not actually happening
+
+**REQUIRED - Only add SFX when:**
+- The script explicitly states the action (e.g., "door SLAMS", "GUNSHOT rings out", "glass SHATTERS")
+- The exact action word appears in an action/description line (Narrator text)
+- You can point to the specific line_id where the action is explicitly described
+
+**Examples of CORRECT SFX selection:**
+✅ Script: "The door SLAMS shut behind him." → Select door slam SFX
+✅ Script: "A GUNSHOT echoes through the warehouse." → Select gunshot SFX
+✅ Script: "She drops the glass. It SHATTERS on the floor." → Select glass breaking SFX
+
+**Examples of INCORRECT SFX selection:**
+❌ Script: "He walks into the room." → Do NOT add footsteps (walking is implied, not emphasized)
+❌ Script: "She angrily storms out." → Do NOT add door slam (door not explicitly mentioned)
+❌ Script dialogue: "Did you hear that gunshot?" → Do NOT add gunshot SFX (mentioned in dialogue, not happening in scene)
+❌ Script: "The room feels tense." → Do NOT add any SFX (mood description, not action)
+
 **ACTION-TO-SFX MAPPING (Trigger words → SFX group):**
 
 | Trigger Words in Script | SFX Group | Priority |

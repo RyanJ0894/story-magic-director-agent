@@ -109,6 +109,34 @@ PHASE 2: AUDIO SELECTION RULES (STRICT MATCHING)
 - Wind mentioned → Add Wind group
 - Storm mentioned → Storm group (thunder, heavy rain)
 
+**CRITICAL - STRICT LOCATION MATCHING ONLY:**
+
+Only select ambience that DIRECTLY matches the scene location specified in the scene header. Do NOT add ambience based on mood, dialogue content, or character memories.
+
+**REQUIRED - Match these elements from scene header:**
+1. INT/EXT designation (Interior = indoor ambience ONLY, Exterior = outdoor ambience ONLY)
+2. Specific location type explicitly stated in scene header (office, street, forest, bedroom, etc.)
+3. Time of day if it affects environmental sound (busy city DAY vs quiet city NIGHT)
+
+**FORBIDDEN - Do NOT select ambience based on:**
+- Character emotions or mood (tense, sad, happy, etc.)
+- Actions happening in the scene
+- Locations mentioned in dialogue or memories
+- Implied or inferred locations not in the scene header
+- Creative interpretation of "what would sound good"
+
+**Examples of CORRECT ambience selection:**
+✅ Scene header: "INT. COFFEE SHOP - DAY" → Select "coffee shop interior" or "restaurant ambience"
+✅ Scene header: "EXT. CITY STREET - NIGHT" → Select "city street night" ambience
+✅ Scene header: "INT. WAREHOUSE - DAY" → Select "warehouse interior" or "industrial space" ambience
+
+**Examples of INCORRECT ambience selection:**
+❌ Scene header: "INT. BEDROOM - NIGHT" / Dialogue mentions ocean → Do NOT select ocean ambience (memory/dialogue, not actual location)
+❌ Scene header: "INT. OFFICE - DAY" / Character feels tense → Do NOT select "suspenseful ambience" (use location-appropriate office ambience instead)
+❌ Scene header: "INT. APARTMENT - DAY" / Character remembers war → Do NOT select battlefield ambience (memory, not current location)
+
+**ALWAYS prioritize the SCENE HEADER location over any other contextual information.**
+
 ### 2.3 SFX SELECTION RULES
 
 **CRITICAL - STRICT MATCHING ONLY:**

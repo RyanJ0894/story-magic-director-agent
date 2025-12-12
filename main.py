@@ -65,6 +65,7 @@ class DirectorResponse(BaseModel):
     message: Optional[str]
     scene_count: Optional[int]
     processing_time: Optional[float]
+    director_data: Any
 
 class HealthResponse(BaseModel):
     status: str
@@ -399,7 +400,8 @@ async def generate_director_scenes_endpoint(request: DirectorRequest):
             success=saved_record.get('success', True),
             message=saved_record.get('message', 'Successfully processed'),
             scene_count=len(director_data.get('scenes', [])),
-            processing_time=processing_time
+            processing_time=processing_time,
+            director_data=director_data
         )
 
     except ValueError as ve:
@@ -424,8 +426,6 @@ async def startup_event():
         logger.info("GROQ_API_KEY is configured")
     
     logger.info("Director RAG Agent API started")
-    logger.info(f"Director Model: {os.getenv('DIRECTOR_MODEL', 'groq/llama-3.3-70b-versatile')}")
-    logger.info(f"Audio Model: {os.getenv('AUDIO_DIRECTOR_MODEL', 'groq/llama-3.3-70b-versatile')}")
     logger.info(f"Retry Config: max_retries={MAX_RETRIES}, delay={RETRY_DELAY_SECONDS}s")
 
 

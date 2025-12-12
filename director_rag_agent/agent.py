@@ -23,8 +23,8 @@ from director_rag_agent.tools.audio_search_tool import (
 )
 
 # Configuration
-DEFAULT_MODEL = os.getenv("DIRECTOR_MODEL", "groq/llama-3.3-70b-versatile")
-AUDIO_DIRECTOR_MODEL = os.getenv("AUDIO_DIRECTOR_MODEL", "groq/llama-3.3-70b-versatile")
+DEFAULT_MODEL = os.getenv("DIRECTOR_MODEL", "openai/gpt-4.1")
+AUDIO_DIRECTOR_MODEL = os.getenv("AUDIO_DIRECTOR_MODEL", "openai/gpt-4.1")
 
 # Script abbreviation expansion dictionary for audio playback
 SCRIPT_ABBREVIATIONS = """
@@ -688,7 +688,8 @@ class LiteLLMAgent:
         system_prompt: str,
         tools: List[Dict],
         tools_map: Dict[str, Callable],
-        description: str = ""
+        description: str = "",
+        reasoning_effort: str = "medium"
     ):
         self.name = name
         self.model = model
@@ -697,6 +698,7 @@ class LiteLLMAgent:
         self.tool_executor = ToolExecutor(tools_map)
         self.description = description
         self.max_iterations = 20  # Prevent infinite loops
+        self.reasoning_effort = reasoning_effort  # "low", "medium", or "high"
     
     def run(self, user_input: str) -> str:
         """Run the agent with the given user input."""
@@ -711,14 +713,25 @@ class LiteLLMAgent:
             logger.info(f"[{self.name}] Iteration {iteration}")
             
             try:
-                response = completion(
-                    model=self.model,
-                    messages=messages,
-                    tools=self.tools if self.tools else None,
-                    tool_choice="auto" if self.tools else None,
-                    temperature=0.7,
-                    max_tokens=8192
-                )
+                # Build completion kwargs with reasoning support for OpenAI GPT-4o
+                completion_kwargs = {
+                    "model": self.model,
+                    "messages": messages,
+                    "temperature": 1,  # Required for reasoning models
+                    "max_completion_tokens": 16384,  # Use max_completion_tokens for reasoning models
+                }
+                
+                # Add tools if available
+                if self.tools:
+                    completion_kwargs["tools"] = self.tools
+                    completion_kwargs["tool_choice"] = "auto"
+                
+                # Add reasoning effort for OpenAI models that support it
+                # This enables extended thinking/reasoning capabilities
+                # if "openai" in self.model.lower() or "gpt-4" in self.model.lower():
+                #     completion_kwargs["effort"] = self.reasoning_effort
+                
+                response = completion(**completion_kwargs)
             except Exception as e:
                 logger.error(f"[{self.name}] LLM call failed: {e}")
                 raise

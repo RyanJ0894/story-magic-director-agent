@@ -393,7 +393,7 @@ async def generate_director_scenes_endpoint(request: DirectorRequest):
         
         end_time = time.time()
         processing_time = round(end_time - start_time, 2)
-
+        logger.info(f"director json generation completed for project_id: {request.project_id}")
         return DirectorResponse(
             project_id=request.project_id,
             success=saved_record.get('success', True),

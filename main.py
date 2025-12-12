@@ -65,7 +65,6 @@ class DirectorResponse(BaseModel):
     message: Optional[str]
     scene_count: Optional[int]
     processing_time: Optional[float]
-    director_data: Any
 
 class HealthResponse(BaseModel):
     status: str
@@ -401,7 +400,6 @@ async def generate_director_scenes_endpoint(request: DirectorRequest):
             message=saved_record.get('message', 'Successfully processed'),
             scene_count=len(director_data.get('scenes', [])),
             processing_time=processing_time,
-            director_data=director_data
         )
 
     except ValueError as ve:

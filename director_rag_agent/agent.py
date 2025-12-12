@@ -264,11 +264,90 @@ Output text: "Interior/Exterior. Israel. United States Army Base. Medical Tent. 
   * "Female Under 10" - child female voices
   * "Narrator" - professional narrator voices (male and female)
 
-**Voice Matching Strategy:**
-1. For narrators: Use label="Narrator" or search "narrator documentary"
-2. For character age: Match label to character age
-3. For personality: Combine query + tone filter
-4. For regional characters: Use style filter
+**Voice Matching Strategy and Assignment Rules:**
+
+**CRITICAL PRIORITY ORDER:**
+1. **RACE/ETHNICITY** (Highest Priority - MUST match first)
+2. **AGE** (Second Priority)
+3. **GENDER** (Third Priority)
+4. **PERSONALITY/TONE** (Fourth Priority)
+
+**RACE/ETHNICITY MATCHING (MANDATORY - CHECK THIS FIRST):**
+
+When searching for voices, you MUST check the character description for racial/ethnic identifiers and include the appropriate style parameter:
+
+- **African American / Black character** → MUST include `style="African American"` in search_voices()
+- **Caucasian / White character** → MUST include `style="American"` in search_voices()
+- **Hispanic / Latino character** → MUST include `style="Hispanic American"` in search_voices()
+- **British character** → Use `style="British"` ONLY if script explicitly mentions "British", "English", "from London", etc.
+- **Southern U.S. character** → Use `style="Southern American"` ONLY if script mentions Southern accent/region
+- **IF NO RACE/ETHNICITY MENTIONED** → Default to `style="American"`
+
+**IMPORTANT NOTES:**
+- "American" style in metadata = Caucasian/White voices by default
+- Race/ethnicity matching takes ABSOLUTE PRIORITY over all other characteristics
+- You cannot skip the style parameter when race/ethnicity is mentioned
+- Always read character descriptions carefully for racial/ethnic indicators
+
+**AGE MATCHING (Second Priority):**
+- **Character age 13-19** → MUST use `label="Male Teen"` or `label="Female Teen"`
+- **Character age 20-39** → Use `label="Male 20s to 30s"` or `label="Female - 20s to 30s"`
+- **Character age 40+** → Use `label="Older Male"` or `label="Older Female"`
+- **Child under 13** → Use `label="Male Under 10"` or `label="Female Under 10"`
+
+**NARRATOR VOICES (Exception):**
+- Can be ANY voice with `label="Narrator"`
+- No race/ethnicity or accent restrictions for narrators
+- Choose based on tone and delivery style only
+
+**SEARCH EXAMPLES:**
+
+Example 1 - African American Male Character:
+```python
+search_voices(
+    query="confident strong military man",
+    gender="Male",
+    style="African American",  # REQUIRED - character is Black
+    label="Male 20s to 30s"
+)
+```
+
+Example 2 - Caucasian Female Character:
+```python
+search_voices(
+    query="warm caring nurse",
+    gender="Female",
+    style="American",  # "American" = Caucasian default
+    label="Female - 20s to 30s"
+)
+```
+
+Example 3 - Hispanic Male Teen:
+```python
+search_voices(
+    query="energetic young teenager",
+    gender="Male",
+    style="Hispanic American",  # REQUIRED - character is Hispanic
+    label="Male Teen"
+)
+```
+
+Example 4 - Character with no race mentioned:
+```python
+search_voices(
+    query="professional businessman",
+    gender="Male",
+    style="American",  # Default when no race specified
+    label="Male 20s to 30s"
+)
+```
+
+**VOICE SELECTION RANDOMIZATION:**
+- When multiple voices match all criteria, randomly select ONE from the top 3-5 matches
+- DO NOT always pick the first/highest-ranked result
+- Use variety - if processing the same script multiple times, select different matching voices each time
+- This ensures fresh casting choices while maintaining character appropriateness
+- Randomization should happen AFTER filtering by race/ethnicity, age, and gender
 
 ### FINAL CHECKLIST BEFORE OUTPUT
 
@@ -440,9 +519,98 @@ PHASE 2: AUDIO SELECTION RULES (STRICT MATCHING)
 | Inside car (moving) | Vehicles Ambience | Engine, road noise |
 | Crowd/event | Big Crowds, Small Crowds | Based on crowd size |
 
+**CRITICAL - STRICT LOCATION MATCHING ONLY:**
+
+Ambience selection must be based SOLELY on the scene header location. Do not be influenced by dialogue content, character emotions, or memories.
+
+**SELECTION CRITERIA (ALL MUST BE TRUE):**
+1. The scene header explicitly states the location
+2. You match INT (interior) with indoor ambience, EXT (exterior) with outdoor ambience
+3. The ambience reflects the ACTUAL PHYSICAL LOCATION in the scene header
+4. Time of day from scene header affects the selection (DAY = busier, NIGHT = quieter for exterior locations)
+
+**FORBIDDEN - NEVER select ambience based on:**
+❌ Character emotions or mood states (happy, sad, tense, etc.)
+❌ Actions or events happening in the scene
+❌ Locations mentioned in dialogue or character memories
+❌ Implied or inferred locations not stated in scene header
+❌ What would "enhance" the scene emotionally
+❌ Creative interpretation of atmosphere
+
+**REQUIRED - ONLY select ambience when:**
+✅ Scene header clearly states the location (INT. OFFICE, EXT. STREET, etc.)
+✅ You match the exact location type to appropriate ambience group
+✅ INT = indoor ambience, EXT = outdoor ambience (no exceptions)
+✅ Time of day modifies the selection appropriately
+
+**EXAMPLES - Learn from these:**
+
+**CORRECT Ambience Selection:**
+✅ Scene header: "INT. COFFEE SHOP - DAY" → Select "cafe interior ambience" or "restaurant chatter"
+✅ Scene header: "EXT. CITY STREET - NIGHT" → Select "city street night quiet" ambience
+✅ Scene header: "INT. WAREHOUSE - DAY" → Select "warehouse interior" or "large empty space" ambience
+✅ Scene header: "EXT. FOREST - MORNING" → Select "forest birds morning" ambience
+
+**INCORRECT Ambience Selection (DO NOT DO THIS):**
+❌ Scene header: "INT. BEDROOM - NIGHT" | Character says: "I miss the ocean"
+   → Do NOT select ocean ambience (memory in dialogue, not actual location)
+
+❌ Scene header: "INT. OFFICE - DAY" | Scene is tense/suspenseful
+   → Do NOT select "suspenseful dark ambience" - use "office interior" (location > mood)
+
+❌ Scene header: "INT. APARTMENT - EVENING" | Character remembers war
+   → Do NOT select battlefield ambience (memory, not current location)
+
+❌ Scene header: "INT. HOSPITAL ROOM - DAY" | Character feels peaceful
+   → Do NOT select "peaceful nature ambience" - use "hospital equipment beeps" (location > emotion)
+
+**KEY PRINCIPLE:** The scene header location is LAW. Ignore everything else. Match location type only.
+
 ### 2.3 SFX SELECTION RULES
 
-**ACTION-TO-SFX MAPPING (Trigger words → SFX group):**
+**CRITICAL - STRICT MATCHING ONLY:**
+
+You may ONLY select SFX when there is a DIRECT, EXPLICIT action stated in the script text. Do not infer, imply, or creatively interpret actions.
+
+**SELECTION CRITERIA (ALL MUST BE TRUE):**
+1. The action must be explicitly written in an action/description line (Narrator text)
+2. The action word must clearly indicate a sound-producing event
+3. You can point to the exact line_id where the action is described
+4. The action is happening NOW in the scene (not in dialogue, not in memories, not implied)
+
+**FORBIDDEN - NEVER add SFX for:**
+❌ Actions implied or inferred from context
+❌ General atmosphere or mood (use ambience for environment)
+❌ Actions that "might" be happening based on logic
+❌ Actions mentioned in dialogue but not actually occurring
+❌ Creative interpretation of what "should" be there
+❌ Walking or movement unless explicitly emphasized (e.g., "FOOTSTEPS echo")
+
+**REQUIRED - ONLY add SFX when:**
+✅ Script explicitly states the action with emphasis (capitalized, specific verb)
+✅ The action is written in an action line (Narrator text), not dialogue
+✅ The action clearly produces a distinct sound
+✅ You can cite the specific line_id where it's mentioned
+
+**EXAMPLES - Learn from these:**
+
+**CORRECT SFX Selection:**
+✅ Script: "The door SLAMS shut behind him." → Select door slam SFX at this line
+✅ Script: "A GUNSHOT echoes. He falls." → Select gunshot SFX at this line
+✅ Script: "She drops the glass. It SHATTERS on the floor." → Select glass break SFX at this line
+✅ Script: "The phone RINGS loudly." → Select phone ring SFX at this line
+
+**INCORRECT SFX Selection (DO NOT DO THIS):**
+❌ Script: "He walks into the room." → Do NOT add footsteps SFX (walking not emphasized)
+❌ Script: "She storms out angrily." → Do NOT add door slam SFX (door not mentioned)
+❌ Script dialogue: "Did you hear that gunshot?" → Do NOT add gunshot SFX (mentioned in dialogue, not happening now)
+❌ Script: "The room feels tense." → Do NOT add any SFX (mood, not action)
+❌ Script: "He remembers the explosion." → Do NOT add explosion SFX (memory, not current)
+❌ Script: "She enters the house." → Do NOT add door SFX (entering implied, not emphasized)
+
+**KEY PRINCIPLE:** When in doubt, DO NOT add the SFX. Only add when absolutely certain the action is explicitly stated.
+
+**ACTION-TO-SFX MAPPING (Only use when action is explicitly stated):**
 
 | Trigger Words in Script | SFX Group | Priority |
 |------------------------|-----------|----------|

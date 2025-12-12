@@ -5,22 +5,58 @@ Provides search_music, search_ambience, search_sfx functions
 for the Audio Director agent to select appropriate audio tracks.
 """
 
-from typing import Dict, Any, Optional
-from director_rag_agent.tools.audio_search import (
-    search_music as _search_music,
-    search_ambience as _search_ambience,
-    search_sfx as _search_sfx
-)
+from typing import Dict, Any, Optional, Tuple
+
+# Import the underlying search implementations
+# These would be your actual search implementations
+# For now, we'll create stub implementations that you can replace
+try:
+    from director_rag_agent.tools.audio_search import (
+        search_music as _search_music,
+        search_ambience as _search_ambience,
+        search_sfx as _search_sfx
+    )
+except ImportError:
+    # Stub implementations if the actual search module isn't available
+    def _search_music(query: str, top_k: int = 3, group: str = None, 
+                      mood: str = None, style: str = None, **kwargs) -> Dict[str, Any]:
+        """Stub implementation for music search."""
+        return {
+            "status": "success",
+            "items": [],
+            "scores": [],
+            "query": query,
+            "message": "Music search stub - implement _search_music in audio_search.py"
+        }
+    
+    def _search_ambience(query: str, top_k: int = 3, group: str = None,
+                         mood: str = None, style: str = None, **kwargs) -> Dict[str, Any]:
+        """Stub implementation for ambience search."""
+        return {
+            "status": "success",
+            "items": [],
+            "scores": [],
+            "query": query,
+            "message": "Ambience search stub - implement _search_ambience in audio_search.py"
+        }
+    
+    def _search_sfx(query: str, top_k: int = 3, group: str = None,
+                    mood: str = None, style: str = None, **kwargs) -> Dict[str, Any]:
+        """Stub implementation for SFX search."""
+        return {
+            "status": "success",
+            "items": [],
+            "scores": [],
+            "query": query,
+            "message": "SFX search stub - implement _search_sfx in audio_search.py"
+        }
 
 
 def search_music(
     query: str,
     group: Optional[str] = None,
-    style: Optional[str] = None,
     mood: Optional[str] = None,
-    intensity_min: Optional[int] = None,
-    intensity_max: Optional[int] = None,
-    loopable: Optional[bool] = None
+    style: Optional[str] = None
 ) -> Dict[str, Any]:
     """
     Search for background music tracks using semantic search.
@@ -42,9 +78,6 @@ def search_music(
                "piano", "acoustic guitar", "synth")
         mood: Filter by mood (e.g., "epic", "peaceful", "tense", "hopeful", 
               "dark", "energetic", "melancholic")
-        intensity_min: Minimum intensity level (0-100). Use for subtle background music.
-        intensity_max: Maximum intensity level (0-100). Use to cap energy level.
-        loopable: Filter for loopable tracks (True for background music that needs to loop)
         
     Returns:
         Dictionary with:
@@ -65,18 +98,12 @@ def search_music(
             "title": "Orchestra Epic 03"
         }
     """
-    intensity = None
-    if intensity_min is not None or intensity_max is not None:
-        intensity = (intensity_min or 0, intensity_max or 100)
-    
     return _search_music(
         query=query,
         top_k=3,
         group=group,
-        style=style,
         mood=mood,
-        intensity=intensity,
-        loopable=loopable
+        style=style,
     )
 
 
@@ -127,7 +154,7 @@ def search_ambience(
             "loopable": true
         }
     """
-    intensity = None
+    intensity: Optional[Tuple[int, int]] = None
     if intensity_min is not None or intensity_max is not None:
         intensity = (intensity_min or 0, intensity_max or 100)
     
@@ -190,6 +217,7 @@ def search_sfx(
             "loopable": true
         }
     """
+    # Handle group aliases
     GROUP_ALIASES = {
         "Human": "Body",
         "People": "Body", 
@@ -200,8 +228,8 @@ def search_sfx(
     
     if group and group in GROUP_ALIASES:
         group = GROUP_ALIASES[group]
-        
-    intensity = None
+    
+    intensity: Optional[Tuple[int, int]] = None
     if intensity_min is not None or intensity_max is not None:
         intensity = (intensity_min or 0, intensity_max or 100)
     

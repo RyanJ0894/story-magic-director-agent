@@ -1,30 +1,22 @@
+"""
+Audio Director Agent Module
+
+Standalone module for the AudioDirectorAgent using LiteLLM with Groq.
+"""
+
 import os
 import logging
-from google.adk.agents import LlmAgent
-from google.adk.tools import FunctionTool
-from director_rag_agent.tools.audio_search_tool import (
-    search_music,
-    search_ambience,
-    search_sfx
-)
-from google.adk.models.lite_llm import LiteLlm
+import json
+from typing import Dict, Any, List, Callable
+
+from litellm import completion
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-DEFAULT_MODEL = os.getenv("AUDIO_DIRECTOR_MODEL", "gemini-2.5-flash")
+DEFAULT_MODEL = os.getenv("AUDIO_DIRECTOR_MODEL", "groq/llama-3.3-70b-versatile")
 
-# Create function tools
-search_music_tool = FunctionTool(search_music)
-search_ambience_tool = FunctionTool(search_ambience)
-search_sfx_tool = FunctionTool(search_sfx)
-
-AUDIO_DIRECTOR_PROMPT = """You are an expert Audio Director and Sound Designer with decades of experience in film scoring and sound design. Your task is to analyze a Director JSON and select PRECISELY matched audio for each scene.
-
-INPUT: Director JSON with structure:
-```python
-{director_json}
-```
+AUDIO_DIRECTOR_SYSTEM_PROMPT = """You are an expert Audio Director and Sound Designer with decades of experience in film scoring and sound design. Your task is to analyze a Director JSON and select PRECISELY matched audio for each scene.
 
 ═══════════════════════════════════════════════════════════════════════════════
 PHASE 1: DEEP SCENE ANALYSIS (MANDATORY - DO THIS FIRST)
@@ -66,12 +58,6 @@ PHASE 2: AUDIO SELECTION RULES (STRICT MATCHING)
 
 ### 2.1 MUSIC SELECTION RULES
 
-**SCENE LENGTH RULE (CHECK THIS FIRST):**
-- Before selecting ANY music, count the total words in the scene (all dialogue + action text combined)
-- **If scene has LESS than 250 words → DO NOT ADD MUSIC** (set music array to empty: `"music": []`)
-- **If scene has 250+ words → Proceed with music selection**
-- NOT ALL SCENES REQUIRE MUSIC - only add if it enhances the scene
-
 **MOOD-TO-GROUP MAPPING (Use this exact mapping):**
 
 | Scene Mood/Situation | Music Group | When to Use |
@@ -91,13 +77,6 @@ PHASE 2: AUDIO SELECTION RULES (STRICT MATCHING)
 - Low intensity scenes (quiet dialogue, reflection): Choose tracks with intensity 40-55
 - Medium intensity (building tension, moderate action): Choose tracks with intensity 55-70
 - High intensity (action peaks, emotional climax): Choose tracks with intensity 70-85
-
-**MUSIC PLACEMENT & VOLUME:**
-- Music should begin at LOW volume from the start of the scene
-- Gradually increase volume throughout the scene
-- Maximum volume should be SIGNIFICANTLY LOWER than dialogue voices
-- The orchestrator will handle final volume mixing (voices always loudest)
-- Music provides emotional support but should never overpower dialogue
 
 **STYLE CONSIDERATION:**
 - Period pieces → orchestral strings, piano
@@ -124,17 +103,6 @@ PHASE 2: AUDIO SELECTION RULES (STRICT MATCHING)
 | War zone, combat | Battlefield / War Zones | Gunfire, explosions |
 | Inside car (moving) | Vehicles Ambience | Engine, road noise |
 | Crowd/event | Big Crowds, Small Crowds | Based on crowd size |
-
-**AMBIENCE DURATION & LOOPING RULES:**
-- If ambience describes the OVERALL scene environment (e.g., "city street", "forest", "office"), it should play for the ENTIRE scene
-- If the ambience audio track is shorter than the scene duration, mark it to loop: Add parameter `"loop": true`
-- Scene-specific ambience (describing overall setup) gets `"loop": true`
-- Short ambience for specific moments (e.g., "brief wind gust") gets `"loop": false`
-
-**SCENE BOUNDARY RULES:**
-- Ambience and SFX MUST STOP at scene end markers: CUT TO:, DISSOLVE TO:, FLASHBACK TO:, BACK TO:
-- Do NOT carry ambience from one scene into the next
-- Each scene gets its own fresh ambience selection
 
 **WEATHER OVERLAY:**
 - Rain mentioned → Add Rain or Storm group
@@ -166,22 +134,10 @@ PHASE 2: AUDIO SELECTION RULES (STRICT MATCHING)
 | moan, groan, pain, scream, cry | Body | MEDIUM |
 | breathing, gasp, sigh, cough | Body | LOW |
 
-**SFX TIMING & DURATION RULES:**
-- SFX must be tied to a specific `line_id` where the action occurs or is mentioned
-- The SFX will play at the exact moment that line is heard in the audio playback
+**SFX TIMING RULES:**
+- SFX must be tied to a specific `line_id` where the action occurs
 - If action spans multiple lines, use the FIRST line where it begins
-- **Duration Guidelines:**
-  - Short impacts (gunshot, door slam, glass break): `"duration": 2` (2 seconds)
-  - Medium actions (footsteps, phone ring): `"duration": 5` (5 seconds)  
-  - Sustained sounds (car engine, alarm): `"duration": 10` (10 seconds)
-- If the SFX audio clip itself is shorter than these durations, that's fine - use the clip's natural length
-- Minimum play time: 2 seconds, Maximum: 10 seconds (unless clip is naturally shorter/longer)
-
-**SFX VOLUME HIERARCHY:**
-- Dialogue voices are ALWAYS loudest in the mix
-- SFX should be clearly audible but never overpower voices
-- The orchestrator will handle final volume balancing
-- Select impactful SFX that support the action without dominating
+- Duration should match the action length (short impact=2-3s, sustained=5-10s)
 
 ═══════════════════════════════════════════════════════════════════════════════
 PHASE 3: SEARCH STRATEGY
@@ -240,15 +196,6 @@ PHASE 4: OUTPUT GENERATION
 
 ### 4.1 JSON OUTPUT STRUCTURE
 
-**IMPORTANT - VOLUME HIERARCHY:**
-All volume balancing is handled by the orchestrator with this hierarchy:
-1. **Dialogue Voices** = Loudest (0dB baseline)
-2. **SFX** = Lower than voices (support action)
-3. **Ambience** = Lower than SFX (background environment)
-4. **Music** = Lowest (emotional underscore)
-
-Your job is to select appropriate audio; the orchestrator ensures voices always stay upfront.
-
 ```json
 {
   "project_id": "xxx",
@@ -257,31 +204,30 @@ Your job is to select appropriate audio; the orchestrator ensures voices always 
       "scene_id": "scene_001",
       "music": [
         {
-          "file": "music/m_drums_orchestra_tense_01.mp3",
+          "file": "music/m_drums_orchestra_tense_01.mp3"
         }
       ],
       "ambience": [
         {
-          "file": "ambience/a_industrial_warehouse_01.mp3",
+          "file": "ambience/a_industrial_warehouse_01.mp3"
         }
       ],
       "sfx": [
         {
           "file": "sfx/s_door_slam_01.mp3",
           "start_at": "line_003",
-          "duration": 2,
+          "duration": 2
         },
         {
           "file": "sfx/s_single_gunshot_01.mp3",
           "start_at": "line_008",
-          "duration": 3,
+          "duration": 3
         }
       ]
     }
   ]
 }
 ```
-
 
 ═══════════════════════════════════════════════════════════════════════════════
 TOOL CALL LIMITS (STRICTLY ENFORCED)
@@ -304,10 +250,7 @@ For each scene, follow this exact sequence:
 □ 4. Identify the PRIMARY mood (pick ONE dominant mood)
 □ 5. Map mood → Music Group using the table above
 □ 6. Map location → Ambience Group using the table above
-□ 7. Scan for action trigger words → list ALL potential SFX matches (prioritize top 3 most impactful)
-     - Read EVERY line of dialogue and action text
-     - Match trigger words from the ACTION-TO-SFX table
-     - Identify ALL matches, then select the 3 most important/impactful sounds
+□ 7. Scan for action trigger words → list SFX needs (max 3)
 □ 8. Execute searches with specific parameters
 □ 9. Select best matches from results - Document selection reason
 □ 10. Output valid JSON
@@ -337,19 +280,237 @@ COMMON MISTAKES TO AVOID
 Output ONLY valid JSON. No additional commentary outside the JSON structure.
 """
 
-groq_model = LiteLlm(
-  model='groq/llama-3.3-70b-versatile'
-)
+# Tool definitions for function calling
+AUDIO_DIRECTOR_TOOLS = [
+    {
+        "type": "function",
+        "function": {
+            "name": "search_music",
+            "description": "Search for background music tracks using semantic search",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "Semantic search string describing desired music (e.g., 'epic orchestral battle', 'peaceful piano melody')"
+                    },
+                    "group": {
+                        "type": "string",
+                        "description": "Filter by music category (EPIC, UPLIFTING, TENSION, SAD, ACTION, ROMANTIC, HORROR, COMEDY, AMBIENT)"
+                    },
+                    "mood": {
+                        "type": "string",
+                        "description": "Filter by mood (e.g., 'epic', 'peaceful', 'tense', 'hopeful')"
+                    },
+                    "style": {
+                        "type": "string",
+                        "description": "Filter by musical style (e.g., 'orchestral strings', 'electronic', 'piano')"
+                    }
+                },
+                "required": ["query"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "search_ambience",
+            "description": "Search for ambient background sounds using semantic search",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "Semantic search string describing desired ambience (e.g., 'busy city street', 'quiet forest birds')"
+                    },
+                    "group": {
+                        "type": "string",
+                        "description": "Filter by ambience category (People in the City, Suburbs & Countryside, Interior Spaces, Weather, Nature, Industrial, Transportation)"
+                    },
+                    "style": {
+                        "type": "string",
+                        "description": "Filter by style (e.g., 'door sounds', 'general effect', 'crowd')"
+                    },
+                    "mood": {
+                        "type": "string",
+                        "description": "Filter by mood (e.g., 'peaceful', 'busy', 'urban', 'natural')"
+                    }
+                },
+                "required": ["query"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "search_sfx",
+            "description": "Search for sound effects using semantic search",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "query": {
+                        "type": "string",
+                        "description": "Semantic search string describing desired sound effect (e.g., 'gunshot explosion', 'door slam')"
+                    },
+                    "group": {
+                        "type": "string",
+                        "description": "Filter by SFX category (Fighting, Explosions, Weapons, Footsteps, Doors, Vehicles, Technology, Body, Glass, Metal)"
+                    },
+                    "style": {
+                        "type": "string",
+                        "description": "Filter by style (e.g., 'general effect', 'impact', 'whoosh')"
+                    },
+                    "mood": {
+                        "type": "string",
+                        "description": "Filter by mood (e.g., 'neutral', 'intense', 'subtle')"
+                    }
+                },
+                "required": ["query"]
+            }
+        }
+    }
+]
 
-audio_director_agent = LlmAgent(
-    name="AudioDirectorAgent",
-    model=groq_model,
-    instruction=AUDIO_DIRECTOR_PROMPT,
-    description="Analyzes Director JSON and selects precisely-matched music, ambience, and SFX for scenes  and always return a valid json",
-    tools=[
-        search_music_tool,
-        search_ambience_tool,
-        search_sfx_tool
-    ],
-    output_key='scene_audio_json'
-)
+
+class ToolExecutor:
+    """Executes tool calls from LLM responses."""
+    
+    def __init__(self, tools_map: Dict[str, Callable]):
+        self.tools_map = tools_map
+    
+    def execute(self, tool_name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
+        """Execute a tool by name with given arguments."""
+        if tool_name not in self.tools_map:
+            return {"error": f"Unknown tool: {tool_name}"}
+        
+        try:
+            result = self.tools_map[tool_name](**arguments)
+            return result
+        except Exception as e:
+            logger.error(f"Error executing tool {tool_name}: {e}")
+            return {"error": str(e)}
+
+
+class AudioDirectorAgent:
+    """Agent for selecting audio (music, ambience, SFX) for scenes."""
+    
+    def __init__(
+        self,
+        model: str = DEFAULT_MODEL,
+        tools_map: Dict[str, Callable] = None
+    ):
+        self.name = "AudioDirectorAgent"
+        self.model = model
+        self.system_prompt = AUDIO_DIRECTOR_SYSTEM_PROMPT
+        self.tools = AUDIO_DIRECTOR_TOOLS
+        self.description = "Analyzes Director JSON and selects precisely-matched music, ambience, and SFX for scenes"
+        self.max_iterations = 20
+        
+        # Import tools if not provided
+        if tools_map is None:
+            from director_rag_agent.tools.audio_search_tool import (
+                search_music,
+                search_ambience,
+                search_sfx
+            )
+            tools_map = {
+                "search_music": search_music,
+                "search_ambience": search_ambience,
+                "search_sfx": search_sfx
+            }
+        
+        self.tool_executor = ToolExecutor(tools_map)
+    
+    def run(self, director_json: str) -> str:
+        """
+        Run the audio director agent on a Director JSON.
+        
+        Args:
+            director_json: The Director JSON string to analyze
+            
+        Returns:
+            Scene audio JSON string with music, ambience, and SFX selections
+        """
+        user_content = f"Analyze this Director JSON and select audio for each scene:\n\n{director_json}"
+        
+        messages = [
+            {"role": "system", "content": self.system_prompt},
+            {"role": "user", "content": user_content}
+        ]
+        
+        iteration = 0
+        response_message = None
+        
+        while iteration < self.max_iterations:
+            iteration += 1
+            logger.info(f"[{self.name}] Iteration {iteration}")
+            
+            try:
+                response = completion(
+                    model=self.model,
+                    messages=messages,
+                    tools=self.tools,
+                    tool_choice="auto",
+                    temperature=0.7,
+                    max_tokens=8192
+                )
+            except Exception as e:
+                logger.error(f"[{self.name}] LLM call failed: {e}")
+                raise
+            
+            response_message = response.choices[0].message
+            
+            # Check if model wants to call tools
+            if hasattr(response_message, 'tool_calls') and response_message.tool_calls:
+                # Add assistant message with tool calls
+                messages.append(response_message)
+                
+                # Execute each tool call
+                for tool_call in response_message.tool_calls:
+                    function_name = tool_call.function.name
+                    try:
+                        function_args = json.loads(tool_call.function.arguments)
+                    except json.JSONDecodeError:
+                        function_args = {}
+                    
+                    logger.info(f"[{self.name}] Calling tool: {function_name} with args: {function_args}")
+                    
+                    # Execute the tool
+                    tool_result = self.tool_executor.execute(function_name, function_args)
+                    
+                    # Add tool result to messages
+                    messages.append({
+                        "tool_call_id": tool_call.id,
+                        "role": "tool",
+                        "name": function_name,
+                        "content": json.dumps(tool_result)
+                    })
+                
+                # Continue the loop to get next response
+                continue
+            
+            # No tool calls, return the final response
+            return response_message.content
+        
+        logger.warning(f"[{self.name}] Max iterations reached")
+        return response_message.content if response_message else ""
+
+
+# Standalone function for direct use
+def process_director_json(director_json: str, model: str = DEFAULT_MODEL) -> str:
+    """
+    Process a Director JSON to add audio selections.
+    
+    Args:
+        director_json: The Director JSON string
+        model: The LLM model to use
+        
+    Returns:
+        Scene audio JSON string
+    """
+    agent = AudioDirectorAgent(model=model)
+    return agent.run(director_json)
+
+
+# Export the agent for use in sequential pipelines
+audio_director_agent = AudioDirectorAgent()

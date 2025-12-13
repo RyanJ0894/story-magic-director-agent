@@ -259,13 +259,6 @@
     "style": "British"
   },
   {
-    "label": "Male 20s to 30s",
-    "voice_id": "k1SgXRmVVqpFcQpNU1ou",
-    "gender": "Male",
-    "tone": "raspy",
-    "style": "Hispanic American"
-  },
-  {
     "label": "Male Teen",
     "voice_id": "DTKMou8ccj1ZaWGBiotd",
     "gender": "Male",
@@ -397,13 +390,6 @@
     "gender": "Female",
     "tone": "Warm",
     "style": "New Zealand"
-  },
-  {
-    "label": "Older Female",
-    "voice_id": "XxY7LfDr5SzeemL30EAJ",
-    "gender": "Female",
-    "tone": "Southern",
-    "style": "African American"
   },
   {
     "label": "Older Female",

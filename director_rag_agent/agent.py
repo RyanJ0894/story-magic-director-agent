@@ -131,6 +131,27 @@ Line 6: Character A dialogue
 2. For revealed characters, search for the voice using their REVEALED identity
 3. Use the SAME voice_key for all lines from the same character
 
+**CRITICAL - VOICE UNIQUENESS RULE:**
+- **Each character MUST have a UNIQUE voice**
+- **NEVER assign the same voice_id to multiple characters**
+- Track all voice assignments as you search
+- If `search_voices` returns a voice_id already assigned to another character, skip it and select the next best match
+- Keep a list of used voice_ids and exclude them from future searches
+
+**Implementation Strategy:**
+1. Before searching for each character, note which voice_ids have already been assigned
+2. When search_voices returns results, check if the top result is already used
+3. If yes, select the next available voice from the results that hasn't been used
+4. If all results are already used, search again with slightly different parameters
+5. Continue until you find a unique voice for each character
+
+**Example:**
+- Character 1 (John) assigned voice_id: "abc123"
+- Character 2 (Sarah) searches → top result is "abc123"
+  → Skip "abc123" (already used by John)
+  → Select second result "def456" instead
+- Character 3 (Mike) searches → ensure neither "abc123" nor "def456" are selected
+
 ### PHASE 2: SCENE PARSING & JSON CONSTRUCTION
 
 Generate the JSON output with these **Strict Parsing Rules**:
@@ -175,6 +196,37 @@ Before finalizing, verify you have NOT skipped:
 - **REMOVE all parentheticals from the "text" field**
 - Parentheticals are acting directions, NOT spoken words
 - Examples to REMOVE: (O.S.), (V.O.), (CONT'D), (CONT.), (to self), (whispering), (angry), (laughing), (INTERRUPTING), (beat), (sotto), (let's guard down), (depressurizing with a smile), etc.
+
+**RULE 6a - NO PARAPHRASING OR TEXT MODIFICATION (CRITICAL):**
+- **NEVER change, modify, or paraphrase the dialogue text**
+- **NEVER expand contractions** - Keep them exactly as written in the script
+- Examples of FORBIDDEN changes:
+  ❌ "I'm" → "I am" (WRONG - keep as "I'm")
+  ❌ "aren't" → "are not" (WRONG - keep as "aren't")
+  ❌ "ain't" → "is not" (WRONG - keep as "ain't")
+  ❌ "won't" → "will not" (WRONG - keep as "won't")
+  ❌ "can't" → "cannot" (WRONG - keep as "can't")
+  ❌ "y'all" → "you all" (WRONG - keep as "y'all")
+  ❌ "gonna" → "going to" (WRONG - keep as "gonna")
+  ❌ "wanna" → "want to" (WRONG - keep as "wanna")
+
+- **PRESERVE EXACTLY AS WRITTEN:**
+  ✅ Keep all contractions (I'm, you're, we'll, they've, hasn't, etc.)
+  ✅ Keep all slang/informal speech (gonna, wanna, gotta, etc.)
+  ✅ Keep all apostrophes in possessives (John's, Mary's, etc.)
+  ✅ Keep all dialect/accent spellings exactly as written
+  ✅ Keep all punctuation exactly as written
+
+- **ONLY REMOVE:**
+  ✅ Parentheticals like (O.S.), (V.O.), (beat), (laughing), etc.
+
+- **VERBATIM RULE:**
+  The dialogue text must be WORD-FOR-WORD identical to what appears in the script PDF, with the ONLY exception being the removal of parentheticals.
+
+**Example:**
+Input: `JOHN (excited) I'm not gonna lie, that's crazy!`
+Correct Output: `"text": "I'm not gonna lie, that's crazy!"`
+Wrong Output: `"text": "I am not going to lie, that is crazy!"` ❌
 
 **RULE 7 - CHARACTER NAME CONSISTENCY:**
 - If SOLDIER is revealed to be LUCKY, ALL soldier lines use "Lucky" as the character

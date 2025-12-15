@@ -1,0 +1,70 @@
+{
+  "music_selection_examples": [
+    {
+      "scene_type": "tense_confrontation_interior",
+      "description": "Two characters in heated argument indoors",
+      "music_mood": "TENSE or DRAMATIC",
+      "reasoning": "Sparse strings build tension without overwhelming dialogue",
+      "timing": "Start 2-5 seconds before conflict escalates",
+      "avoid": ["Heavy percussion", "Loud brass", "Dense orchestration"]
+    },
+    {
+      "scene_type": "action_chase_exterior",
+      "description": "High-energy chase outdoors",
+      "music_mood": "EPIC or TENSE",
+      "reasoning": "Fast tempo (130-150 BPM) matches urgency",
+      "timing": "Start at first action verb",
+      "avoid": ["Slow tempo", "Overly melodic"]
+    },
+    {
+      "scene_type": "emotional_revelation",
+      "description": "Intimate emotional moment",
+      "music_mood": "SAD or DRAMATIC",
+      "reasoning": "Solo piano/strings feel intimate",
+      "timing": "Start at emotional trigger moment",
+      "avoid": ["Full orchestration", "Extended duration"]
+    },
+    {
+      "scene_type": "horror_suspense",
+      "description": "Building dread, alone",
+      "music_mood": "SCARY or MYSTERIOUS",
+      "reasoning": "Low drones create unease, silence builds dread",
+      "timing": "Start when entering threatening space",
+      "avoid": ["Constant music", "Obvious horror tropes"]
+    },
+    {
+      "scene_type": "romantic_moment",
+      "description": "Connection, kiss, intimacy",
+      "music_mood": "LOVE or UPLIFTING",
+      "reasoning": "Warm acoustic creates hopeful feeling",
+      "timing": "Start at moment of connection",
+      "avoid": ["Overly saccharine", "Clichés"]
+    }
+  ],
+  "sfx_rules": [
+    {
+      "rule": "Only add SFX when action is EXPLICITLY stated or CAPITALIZED",
+      "examples": {
+        "correct": ["Door SLAMS", "GUNSHOT rings out", "Glass SHATTERS"],
+        "incorrect": ["He walks in", "She enters", "They leave"]
+      }
+    },
+    {
+      "rule": "Never infer sounds not written in script",
+      "note": "Walking, entering, exiting = NO SFX unless emphasized"
+    }
+  ],
+  "ambience_rules": [
+    {
+      "rule": "ONLY match scene header location, NOT mood or dialogue",
+      "examples": {
+        "correct": "INT. COFFEE SHOP - DAY → cafe ambience",
+        "incorrect": "Character mentions ocean → ocean ambience (WRONG)"
+      }
+    },
+    {
+      "rule": "INT = indoor ambience, EXT = outdoor ambience",
+      "note": "Never select based on emotions or memories"
+    }
+  ]
+}

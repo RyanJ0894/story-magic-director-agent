@@ -225,6 +225,13 @@
   },
   {
     "label": "Male 20s to 30s",
+    "voice_id": "0I4LODkzfgylrMzbYiDf",
+    "gender": "Male",
+    "tone": "Calm",
+    "style": "American"     
+  },
+  {
+    "label": "Male 20s to 30s",
     "voice_id": "mcuuWJIofmzgKEGk3EMA",
     "gender": "Male",
     "tone": "Deep",

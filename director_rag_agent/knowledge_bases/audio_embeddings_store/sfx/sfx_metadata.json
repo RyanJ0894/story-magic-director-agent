@@ -162,24 +162,6 @@
     ]
   },
   {
-    "file": "sfx/s_fighting_hand_to_hand_01.mp3",
-    "group": "Fighting",
-    "id": "s_fighting_hand_to_hand_01",
-    "intensity": 40,
-    "loopable": true,
-    "mood": [
-      "neutral",
-      "ambient",
-      "cinematic"
-    ],
-    "style": "general effect",
-    "tags": [
-      "fighting",
-      "general",
-      "cinematic"
-    ]
-  },
-  {
     "file": "sfx/s_heartbeat_steady_01.mp3",
     "group": "Heartbeat",
     "id": "s_heartbeat_steady_01",

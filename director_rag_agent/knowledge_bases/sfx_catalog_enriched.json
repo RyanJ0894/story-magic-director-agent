@@ -163,24 +163,6 @@
     ]
   },
   {
-    "file": "sfx/s_fighting_hand_to_hand_01.mp3",
-    "group": "Fighting",
-    "id": "s_fighting_hand_to_hand_01",
-    "intensity": 40,
-    "loopable": true,
-    "mood": [
-      "neutral",
-      "ambient",
-      "cinematic"
-    ],
-    "style": "general effect",
-    "tags": [
-      "fighting",
-      "general",
-      "cinematic"
-    ]
-  },
-  {
     "file": "sfx/s_heartbeat_steady_01.mp3",
     "group": "Heartbeat",
     "id": "s_heartbeat_steady_01",
@@ -577,8 +559,26 @@
     ]
   },
   {
+    "file": "sfx/s_water_waves_crashing_01.wav",
+    "group": "Water (splashes, rushing, crashing)",
+    "id": "s_water_waves_crashing_01",
+    "intensity": 50,
+    "loopable": true,
+    "mood": [
+      "neutral",
+      "ambient",
+      "cinematic"
+    ],
+    "style": "general effect",
+    "tags": [
+      "water (splashes, rushing, crashing)",
+      "general",
+      "cinematic"
+    ]
+  },
+  {
     "file": "sfx/s_drip_on_rythym_01.mp3",
-    "group": "Water (splashes, drips, pouring)",
+    "group": "Water (drips)",
     "id": "s_drip_on_rythym_01",
     "intensity": 70,
     "loopable": true,
@@ -589,7 +589,7 @@
     ],
     "style": "general effect",
     "tags": [
-      "water (splashes, drips, pouring)",
+      "water (drips)",
       "general",
       "cinematic"
     ]

@@ -505,9 +505,9 @@ WRONG Output (missing action lines):
 """
 
 AUDIO_DIRECTOR_SYSTEM_PROMPT = f"""
-═══════════════════════════════════════════════════════════════════════════════
+===============================================================================
 AUDIO SELECTION KNOWLEDGE BASE
-═══════════════════════════════════════════════════════════════════════════════
+===============================================================================
 
 You have access to examples and rules for selecting audio. Study these before making selections:
 
@@ -526,7 +526,7 @@ You have access to examples and rules for selecting audio. Study these before ma
 3. Apply ambience rules strictly - only match scene header location
 4. Reference which example/rule you applied in your reasoning
 
-═══════════════════════════════════════════════════════════════════════════════
+===============================================================================
 
 You are an expert Audio Director and Sound Designer with decades of experience in film scoring and sound design. Your task is to analyze a Director JSON and select PRECISELY matched audio for each scene."""You are an expert Audio Director and Sound Designer with decades of experience in film scoring and sound design. Your task is to analyze a Director JSON and select PRECISELY matched audio for each scene.
 

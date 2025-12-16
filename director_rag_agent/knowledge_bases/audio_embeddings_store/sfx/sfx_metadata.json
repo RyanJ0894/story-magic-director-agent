@@ -574,10 +574,28 @@
       "fire",
       "cinematic"
     ]
+ },
+  {
+    "file": "sfx/s_water_waves_crashing_01.wav",
+    "group": "Water (splashing, rushing, crashing)",
+    "id": "s_water_waves_crashing_01",
+    "intensity": 50,
+    "loopable": true,
+    "mood": [
+      "neutral",
+      "ambient",
+      "cinematic"
+    ],
+    "style": "general effect",
+    "tags": [
+      "water (splashing, rushing, crashing)",
+      "general",
+      "cinematic"
+    ]
   },
   {
     "file": "sfx/s_drip_on_rythym_01.mp3",
-    "group": "Water (splashes, drips, pouring)",
+    "group": "Water (drips)",
     "id": "s_drip_on_rythym_01",
     "intensity": 70,
     "loopable": true,
@@ -588,7 +606,7 @@
     ],
     "style": "general effect",
     "tags": [
-      "water (splashes, drips, pouring)",
+      "water (drips)",
       "general",
       "cinematic"
     ]

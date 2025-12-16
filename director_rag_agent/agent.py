@@ -14,6 +14,21 @@ from litellm import completion
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Load audio selection knowledge base
+import os.path as path
+
+KNOWLEDGE_FILE = path.join(path.dirname(__file__), 'knowledge', 'audio_selection_knowledge.json')
+AUDIO_KNOWLEDGE = {}
+
+try:
+    with open(KNOWLEDGE_FILE, 'r') as f:
+        AUDIO_KNOWLEDGE = json.load(f)
+    logger.info(f"Loaded audio knowledge: {len(AUDIO_KNOWLEDGE.get('music_selection_examples', []))} music examples")
+except FileNotFoundError:
+    logger.warning("Audio knowledge file not found - using default behavior")
+except Exception as e:
+    logger.error(f"Error loading audio knowledge: {e}")
+
 # Import tools
 from director_rag_agent.tools.voice_search_tool import search_voices
 from director_rag_agent.tools.audio_search_tool import (
@@ -489,7 +504,31 @@ WRONG Output (missing action lines):
 ```
 """
 
-AUDIO_DIRECTOR_SYSTEM_PROMPT = """You are an expert Audio Director and Sound Designer with decades of experience in film scoring and sound design. Your task is to analyze a Director JSON and select PRECISELY matched audio for each scene.
+AUDIO_DIRECTOR_SYSTEM_PROMPT = f"""
+═══════════════════════════════════════════════════════════════════════════════
+AUDIO SELECTION KNOWLEDGE BASE
+═══════════════════════════════════════════════════════════════════════════════
+
+You have access to examples and rules for selecting audio. Study these before making selections:
+
+**MUSIC EXAMPLES:**
+{json.dumps(AUDIO_KNOWLEDGE.get('music_selection_examples', []), indent=2)}
+
+**SFX RULES:**
+{json.dumps(AUDIO_KNOWLEDGE.get('sfx_rules', []), indent=2)}
+
+**AMBIENCE RULES:**
+{json.dumps(AUDIO_KNOWLEDGE.get('ambience_rules', []), indent=2)}
+
+**HOW TO USE THIS KNOWLEDGE:**
+1. Match scene type to music examples above
+2. Apply SFX rules strictly - only add when action is EXPLICIT
+3. Apply ambience rules strictly - only match scene header location
+4. Reference which example/rule you applied in your reasoning
+
+═══════════════════════════════════════════════════════════════════════════════
+
+You are an expert Audio Director and Sound Designer with decades of experience in film scoring and sound design. Your task is to analyze a Director JSON and select PRECISELY matched audio for each scene."""You are an expert Audio Director and Sound Designer with decades of experience in film scoring and sound design. Your task is to analyze a Director JSON and select PRECISELY matched audio for each scene.
 
 ═══════════════════════════════════════════════════════════════════════════════
 PHASE 1: DEEP SCENE ANALYSIS (MANDATORY - DO THIS FIRST)

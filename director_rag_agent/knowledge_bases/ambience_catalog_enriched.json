@@ -199,10 +199,10 @@
     ]
   },
   {
-    "file": "ambience/a_city_streets_small_calm_crowds_01.mp3",
+    "file": "ambience/a_parking_lot_small_calm_crowds_01.mp3",
     "group": "Small Crowds",
-    "id": "a_city_streets_small_calm_crowds_01",
-    "intensity": 60,
+    "id": "a_parking_lot_small_calm_crowds_01",
+    "intensity": 50,
     "loopable": true,
     "mood": [
       "social",
@@ -212,14 +212,14 @@
     "style": "city ambience",
     "tags": [
       "small crowds",
-      "city",
+      "parking lot",
       "cinematic"
     ]
   },
   {
-    "file": "ambience/a_public_spaces_people_mall_airport_01.mp3",
+    "file": "ambience/a_public_spaces_people_mall_01.mp3",
     "group": "Small Crowds",
-    "id": "a_public_spaces_people_mall_airport_01",
+    "id": "a_public_spaces_people_mall_01",
     "intensity": 40,
     "loopable": true,
     "mood": [

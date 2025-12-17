@@ -108,9 +108,9 @@
     ]
   },
   {
-    "file": "ambience/a_park_spring_sounds_01.mp3",
-    "group": "Parks",
-    "id": "a_park_spring_sounds_01",
+    "file": "ambience/a_outdoors_spring_sounds_01.mp3",
+    "group": "Outdoors",
+    "id": "a_outdoors_spring_sounds_01",
     "intensity": 50,
     "loopable": true,
     "mood": [
@@ -120,9 +120,9 @@
     ],
     "style": "general effect",
     "tags": [
-      "parks",
+      "outdoors",
       "general",
-      "cinematic"
+      "parks"
     ]
   },
   {
@@ -212,7 +212,7 @@
     "tags": [
       "small crowds",
       "city",
-      "cinematic"
+      "calm"
     ]
   },
   {
@@ -230,7 +230,7 @@
     "tags": [
       "small crowds",
       "general",
-      "cinematic"
+      "cafeteria"
     ]
   },
   {

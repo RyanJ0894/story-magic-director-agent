@@ -289,9 +289,9 @@
     ]
   },
   {
-    "file": "ambience/a_beach_splashing_sloshing_01.mp3",
+    "file": "ambience/a_natural_flowing_water_splashing_sloshing_01.wav",
     "group": "Beach & Ocean",
-    "id": "a_beach_splashing_sloshing_01",
+    "id": "a_natural_flowing_water_splashing_sloshing_01",
     "intensity": 40,
     "loopable": true,
     "mood": [
@@ -299,10 +299,10 @@
       "natural",
       "open"
     ],
-    "style": "ocean/beach ambience",
+    "style": "river/lake ambience",
     "tags": [
-      "beach & ocean",
-      "ocean/beach",
+      "river & lake",
+      "river/lake",
       "cinematic"
     ]
   },

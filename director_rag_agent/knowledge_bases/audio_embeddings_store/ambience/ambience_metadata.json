@@ -198,10 +198,10 @@
     ]
   },
   {
-    "file": "ambience/a_city_streets_small_calm_crowds_01.mp3",
+    "file": "ambience/a_parking_lot_small_calm_crowds_01.mp3",
     "group": "Small Crowds",
-    "id": "a_city_streets_small_calm_crowds_01",
-    "intensity": 60,
+    "id": "a_parking_lot_small_calm_crowds_01",
+    "intensity": 50,
     "loopable": true,
     "mood": [
       "social",
@@ -211,7 +211,7 @@
     "style": "city ambience",
     "tags": [
       "small crowds",
-      "city",
+      "parking lot",
       "calm"
     ]
   },

@@ -1,70 +1,805 @@
 {
-  "music_selection_examples": [
+  "ambience_examples": [
     {
-      "scene_type": "tense_confrontation_interior",
-      "description": "Two characters in heated argument indoors",
-      "music_mood": "TENSE or DRAMATIC",
-      "reasoning": "Sparse strings build tension without overwhelming dialogue",
-      "timing": "Start 2-5 seconds before conflict escalates",
-      "avoid": ["Heavy percussion", "Loud brass", "Dense orchestration"]
+      "scene_header": "EXT. FOREST RIVERBANKS - DAY",
+      "ambience_file": "a_forest_calm_01.mp3",
+      "reasoning": "Exterior forest location, daytime = calm forest birds and wind"
     },
     {
-      "scene_type": "action_chase_exterior",
-      "description": "High-energy chase outdoors",
-      "music_mood": "EPIC or TENSE",
-      "reasoning": "Fast tempo (130-150 BPM) matches urgency",
-      "timing": "Start at first action verb",
-      "avoid": ["Slow tempo", "Overly melodic"]
+      "scene_header": "EXT. TRENT'S TOWN HOME - HOUSTON TX - FRONT YARD - DAY",
+      "ambience_file": "a_park_spring_sounds_01.wav",
+      "reasoning": "Front yard exterior residential = light birds and outdoor suburban ambience"
     },
     {
-      "scene_type": "emotional_revelation",
-      "description": "Intimate emotional moment",
-      "music_mood": "SAD or DRAMATIC",
-      "reasoning": "Solo piano/strings feel intimate",
-      "timing": "Start at emotional trigger moment",
-      "avoid": ["Full orchestration", "Extended duration"]
+      "scene_header": "INT. HIGH RISE CONDO - ROOFTOP POOL - DAY - (PRESENT)",
+      "ambience_file": "a_city_streets_small_calm_crowds_01",
+      "reasoning": "Rooftop pool party setting = distant urban sounds with light crowd chatter"
     },
     {
-      "scene_type": "horror_suspense",
-      "description": "Building dread, alone",
-      "music_mood": "SCARY or MYSTERIOUS",
-      "reasoning": "Low drones create unease, silence builds dread",
-      "timing": "Start when entering threatening space",
-      "avoid": ["Constant music", "Obvious horror tropes"]
+      "scene_header": "INT. HIGH SCHOOL - CAFETERIA - DAY",
+      "ambience_file": "a_public_spaces_people_mall_01",
+      "reasoning": "Busy cafeteria = active crowd noise and echoing interior public space"
     },
     {
-      "scene_type": "romantic_moment",
-      "description": "Connection, kiss, intimacy",
-      "music_mood": "LOVE or UPLIFTING",
-      "reasoning": "Warm acoustic creates hopeful feeling",
-      "timing": "Start at moment of connection",
-      "avoid": ["Overly saccharine", "Clichés"]
+      "scene_header": "EXT. WOODS - RIVER - DAY",
+      "ambience_file": "a_forest_calm_01.mp3",
+      "reasoning": "Exterior woods = forest birds and nature sounds"
+    },
+    {
+      "scene_header": "EXT. STUDENT PARKING LOT - DAY",
+      "ambience_file": "a_parking_lot_small_calm_crowds_01",
+      "reasoning": "Exterior parking lot = light distant traffic, occasional footsteps and voices"
+    },
+    {
+      "scene_header": "EXT.COUNTRY HOUSE - FRONT YARD - MOMENTS EARLIER",
+      "ambience_file": "a_countryside_birds_01",
+      "reasoning": "Country house exterior = rural birds and open air ambience"
+    },
+    {
+      "scene_header": "I.E. ISRAEL - U.S. ARMY BASE - MEDICAL TENT (4 YEARS AGO)",
+      "ambience_file": "a_military_medical_tent_01",
+      "reasoning": "Military medical tent interior/exterior = bustling medical activity with distant military sounds"
+    },
+    {
+      "scene_header": "INT. MOTEL ROOM",
+      "ambience_file": "NO_AMBIENCE",
+      "reasoning": "Generic interior motel room = no specific ambience required, room tone only"
+    },
+    {
+      "scene_header": "INT. HOSPITAL - DISCHARGE LOBBY",
+      "ambience_file": "a_hospital_hallway_01",
+      "reasoning": "Hospital interior public space = distant PA system, footsteps, quiet conversations"
+    }
+  ],
+  "sfx_examples": [
+    {
+      "script_text": "Close on rushing water off riverbanks. It crashes into rocks violently.",
+      "sfx_file": "s_water_waves_crashing_01.wav",
+      "trigger": "crashes violently",
+      "start_timing": "Line where 'crashes' appears",
+      "duration": "5 seconds then fade out",
+      "reasoning": "'crashes violently' = emphasized water impact action"
+    },
+    {
+      "script_text": "The door SLAMS shut behind him.",
+      "sfx_file": "s_door_slam_heavy_01.wav",
+      "trigger": "SLAMS",
+      "start_timing": "Line where 'SLAMS' appears",
+      "reasoning": "SLAMS is capitalized = emphasized loud door impact"
+    },
+    {
+      "script_text": "There's a RUSTLING in the bushes.",
+      "sfx_file": "s_walking_in_leaves_01",
+      "trigger": "RUSTLING",
+      "start_timing": "The capitalized word RUSTLING",
+      "duration": "5 seconds then fade out",
+      "reasoning": "RUSTLING is capitalized = emphasized bush movement sound"
+    },
+    {
+      "script_text": "Derek quickly tosses the joint from his mouth into the river",
+      "sfx_file": "s_water_splash_small_01.wav",
+      "trigger": "tosses...into the river",
+      "start_timing": "Line where object enters water",
+      "reasoning": "Object entering water = clear sound event"
+    },
+    {
+      "script_text": "Derek punches him in the back of the head",
+      "sfx_file": "s_body_punch_impact_heavy_01.wav",
+      "trigger": "punches him",
+      "start_timing": "Line where 'punches' appears",
+      "reasoning": "Physical punch = emphasized impact sound"
+    },
+    {
+      "script_text": "They're rolling around in the dirt, punching each other.",
+      "sfx_file": "s_body_struggle_ground_01.wav",
+      "trigger": "rolling around",
+      "start_timing": "Line where struggle begins",
+      "duration": "5 seconds continuous",
+      "reasoning": "Physical struggle emphasized = extended fight sound"
+    },
+    {
+      "script_text": "sending him over the riverbanks' cliff, slamming his head into a rock",
+      "sfx_file": "s_body_fall_impact_heavy_01.wav",
+      "trigger": "slamming his head",
+      "start_timing": "Line where impact occurs",
+      "reasoning": "'slamming' = emphasized impact sound event"
+    },
+    {
+      "script_text": "[Car door closes]",
+      "sfx_file": "s_car_door_close_01.wav",
+      "trigger": "[Car door closes]",
+      "start_timing": "Exact location of bracketed notation",
+      "reasoning": "Bracketed sound notation = explicit SFX instruction"
+    },
+    {
+      "script_text": "The TV behind him turns on by itself.",
+      "sfx_file": "s_tv_static_turn_on_01.wav",
+      "trigger": "turns on",
+      "start_timing": "Line where 'turns on' appears",
+      "reasoning": "TV turning on = clear mechanical sound event"
+    },
+    {
+      "script_text": "[SOUND] returns. On a mega horn we hear [COME OUT WITH YOUR HANDS UP. FINAL WARNING]",
+      "sfx_file": "s_megaphone_police_announcement_01.wav",
+      "trigger": "[SOUND] returns",
+      "start_timing": "The bracketed [SOUND] notation",
+      "reasoning": "Bracketed explicit sound notation with specific megaphone announcement"
     }
   ],
   "sfx_rules": [
     {
       "rule": "Only add SFX when action is EXPLICITLY stated or CAPITALIZED",
-      "examples": {
-        "correct": ["Door SLAMS", "GUNSHOT rings out", "Glass SHATTERS"],
-        "incorrect": ["He walks in", "She enters", "They leave"]
-      }
+      "correct_examples": [
+        "Door SLAMS",
+        "GUNSHOT rings out",
+        "Glass SHATTERS",
+        "crashes into rocks violently"
+      ],
+      "incorrect_examples": [
+        "He walks in (NO SFX)",
+        "She enters (NO SFX)",
+        "They leave (NO SFX)"
+      ]
     },
     {
       "rule": "Never infer sounds not written in script",
-      "note": "Walking, entering, exiting = NO SFX unless emphasized"
+      "explanation": "Walking, entering, exiting = NO SFX unless emphasized. Only add SFX for actions that are emphasized or explicitly described."
+    }
+  ],
+  "music_examples": [
+    {
+      "scene_type": "tense_confrontation",
+      "script_scene": "EXT. WOODS - RIVER - DAY (Derek and Frankie fight)",
+      "script_excerpt": "Derek and Frankie argue, tension escalates, physical confrontation",
+      "music_selections": [
+        {
+          "file": "m_strings_orchestra_tense_01.mp3",
+          "mood": "TENSE",
+          "reasoning": "Orchestral strings build tension for dialogue-heavy confrontation, intensity 65 matches escalating argument without overwhelming dialogue",
+          "start_timing": "2-3 seconds before argument intensifies",
+          "avoid": "Heavy percussion or loud brass that would compete with dialogue"
+        },
+        {
+          "file": "m_drums_strings_tesnse_01.mp3",
+          "mood": "TENSE",
+          "reasoning": "Rhythmic tension with strings for when physical fight begins, percussion adds urgency",
+          "start_timing": "When first push/shove occurs",
+          "avoid": "Starting too early during calm dialogue"
+        },
+        {
+          "file": "m_horns_orchestra_tense_01.mp3",
+          "mood": "TENSE",
+          "reasoning": "Brass orchestra for peak confrontation moment when Derek shoves Frankie over cliff",
+          "start_timing": "Final violent action",
+          "avoid": "Using throughout - save for climactic moment"
+        }
+      ]
+    },
+    {
+      "scene_type": "rooftop_pool_party",
+      "script_scene": "INT. HIGH RISE CONDO - ROOFTOP POOL - DAY",
+      "script_excerpt": "Trent and Kurt discuss serious situation at upscale rooftop pool party",
+      "music_selections": [
+        {
+          "file": "m_soul_lounge_groovy_01.mp3",
+          "mood": "GROOVY RETRO",
+          "reasoning": "Soul lounge creates upscale party atmosphere, intensity 50 sits under dialogue naturally, retro vibe fits sophisticated setting",
+          "start_timing": "Scene opening to establish location",
+          "avoid": "Heavy dramatic music that contradicts party setting"
+        },
+        {
+          "file": "m_strings_drums_groovy_01.mp3",
+          "mood": "GROOVY RETRO",
+          "reasoning": "Alternative groovy track with cinematic quality, bouncy rhythm maintains party energy",
+          "start_timing": "Can alternate or layer with lounge track",
+          "avoid": "Sad or scary moods inappropriate for party"
+        }
+      ]
+    },
+    {
+      "scene_type": "high_school_cafeteria",
+      "script_scene": "INT. HIGH SCHOOL - CAFETERIA - DAY (Frankie sits with Derek's group)",
+      "script_excerpt": "Awkward moment as Frankie joins Derek's table, uncomfortable social dynamics",
+      "music_selections": [
+        {
+          "file": "m_piano_strings_playful_01.mp3",
+          "mood": "PLAYFUL",
+          "reasoning": "Light playful tone captures awkward high school social dynamics, whimsical quality fits quirky moment, intensity 45 stays under dialogue",
+          "start_timing": "When Frankie approaches table",
+          "avoid": "Heavy dramatic music - scene is awkward not dangerous"
+        },
+        {
+          "file": "m_jazz_retro_playful_01.mp3",
+          "mood": "PLAYFUL",
+          "reasoning": "Retro jazz adds cheeky undertone to social awkwardness, light intensity appropriate",
+          "start_timing": "Alternative option for same scene mood",
+          "avoid": "Tense or scary music inappropriate"
+        }
+      ]
+    },
+    {
+      "scene_type": "military_medical_tent",
+      "script_scene": "I.E. ISRAEL - U.S. ARMY BASE - MEDICAL TENT",
+      "script_excerpt": "Stacy meets Lucky for first time, busy medical tent with wounded soldiers",
+      "music_selections": [
+        {
+          "file": "m_piano_strings_dramatic_01.mp3",
+          "mood": "DRAMATIC",
+          "reasoning": "Piano and strings create intimate yet serious tone for military medical setting, emotional weight without overwhelming, intensity 75 appropriate",
+          "start_timing": "After establishing tent chaos, when Stacy and Lucky interact",
+          "avoid": "Epic or heroic music - scene is personal not action"
+        },
+        {
+          "file": "m_string_orchestra_dramatic_01.mp3",
+          "mood": "DRAMATIC",
+          "reasoning": "Orchestral strings for wider shots of medical tent, cinematic quality matches war setting",
+          "start_timing": "Opening tent establishing shots",
+          "avoid": "Playful or groovy moods inappropriate"
+        },
+        {
+          "file": "m_strings_drums_dramatic_01.mp3",
+          "mood": "DRAMATIC",
+          "reasoning": "Rhythmic percussion adds urgency to medical emergency context",
+          "start_timing": "High-stress medical moments",
+          "avoid": "Starting during quiet dialogue"
+        }
+      ]
+    },
+    {
+      "scene_type": "emotional_revelation",
+      "script_scene": "INT. COUNTRY HOUSE - LIVINGROOM (Lucky remembers Stacy died)",
+      "script_excerpt": "Lucky breaks down realizing Stacy is dead, emotional climax",
+      "music_selections": [
+        {
+          "file": "m_piano_slow_sad_01.mp3",
+          "mood": "SAD",
+          "reasoning": "Solo piano creates intimate vulnerable moment, melancholic pensive tone, low intensity 40 allows emotion to breathe, tender quality fits revelation",
+          "start_timing": "When Lucky's face changes and tears begin",
+          "avoid": "Full orchestration or dramatic swells - needs intimacy"
+        },
+        {
+          "file": "m_piano_strings_sad_01.mp3",
+          "mood": "SAD",
+          "reasoning": "Piano with strings for slightly broader emotional scope, still intimate",
+          "start_timing": "As realization deepens",
+          "avoid": "Epic or loud music - needs quiet sadness"
+        },
+        {
+          "file": "m_strings_sad_01.mp3",
+          "mood": "SAD",
+          "reasoning": "Strings alone for wider emotional landscape after initial shock",
+          "start_timing": "Extended grief moment",
+          "avoid": "Uplifting music - tone is tragic"
+        }
+      ]
+    },
+    {
+      "scene_type": "mysterious_motel",
+      "script_scene": "INT. MOTEL ROOM (Mamma Bec V.O., police outside)",
+      "script_excerpt": "Ominous scene with narrator voiceover, man tied up, police lights flashing",
+      "music_selections": [
+        {
+          "file": "m_drums_hum_mysterious_01.mp3",
+          "mood": "MYSTERIOUS, SCARY",
+          "reasoning": "Underscore with drums creates ominous noir atmosphere, foreboding mood matches threatening situation, intensity 60 builds dread",
+          "start_timing": "Scene opening with flashing lights",
+          "avoid": "Uplifting or playful - scene is dark thriller"
+        },
+        {
+          "file": "m_paino_soft_mysterious_01.mp3",
+          "mood": "MYSTERIOUS, SCARY",
+          "reasoning": "Soft mysterious piano for voiceover moments, dark underscore supports narration",
+          "start_timing": "During Mamma Bec's philosophical voiceover",
+          "avoid": "Loud dramatic music during quiet VO"
+        },
+        {
+          "file": "m_deep_strings_scary_01.mp3",
+          "mood": "MYSTERIOUS, SCARY",
+          "reasoning": "Deep strings escalate tension when megaphone police warning heard",
+          "start_timing": "When [SOUND] returns and police warning begins",
+          "avoid": "Starting too early - let scene breathe first"
+        }
+      ]
+    },
+    {
+      "scene_type": "romantic_family_moment",
+      "script_scene": "EXT. TRENT'S TOWN HOME - FRONT YARD (Family hug with Delilah)",
+      "script_excerpt": "Trent, Kelsey, and daughter Delilah embrace, tender family moment, glassy eyes",
+      "music_selections": [
+        {
+          "file": "m_piano_strings_love_01.mp3",
+          "mood": "LOVE",
+          "reasoning": "Piano and strings create warm intimate family moment, romantic tender quality, glowing emotional tone, intensity 55 appropriate for bittersweet reunion",
+          "start_timing": "When three-way hug begins",
+          "avoid": "Overly saccharine - moment is bittersweet"
+        },
+        {
+          "file": "m_string_orchestra_love_01.mp3",
+          "mood": "LOVE",
+          "reasoning": "Orchestral strings for wider emotional scope during extended embrace",
+          "start_timing": "When camera zooms to Kelsey's glassy eyes",
+          "avoid": "Jazz or soul - needs cinematic quality"
+        }
+      ]
+    },
+    {
+      "scene_type": "hopeful_hospital_discharge",
+      "script_scene": "INT. HOSPITAL - DISCHARGE LOBBY (Lucky meets Florence)",
+      "script_excerpt": "Lucky leaving hospital, meets nurse Florence, hopeful new connection forming",
+      "music_selections": [
+        {
+          "file": "m_string_orchestra_uplifting_01.mp3",
+          "mood": "UPLIFTING",
+          "reasoning": "Orchestral strings create hopeful bright atmosphere for new beginning, soaring quality matches recovery and new connection, intensity 70 inspiring",
+          "start_timing": "When Florence reveals she called 911 and saved Lucky",
+          "avoid": "Sad music - moment is hopeful despite past tragedy"
+        },
+        {
+          "file": "m_piano_orchestra_uplifting_02.mp3",
+          "mood": "UPLIFTING",
+          "reasoning": "Piano and orchestra for intimate yet hopeful tone, warm connection forming",
+          "start_timing": "Final moments of their conversation",
+          "avoid": "Dark or scary moods inappropriate"
+        },
+        {
+          "file": "m_electronic_uplifting_01.mp3",
+          "mood": "UPLIFTING",
+          "reasoning": "Electronic underscore for modern hospital setting, bright hopeful quality",
+          "start_timing": "Alternative modern option",
+          "avoid": "Too loud - needs to support dialogue"
+        }
+      ]
+    },
+    {
+      "scene_type": "student_parking_lot_confrontation",
+      "script_scene": "EXT. STUDENT PARKING LOT - DAY (Frankie follows Derek on skateboard)",
+      "script_excerpt": "Frankie tries to befriend Derek, Derek rejects him, tension builds",
+      "music_selections": [
+        {
+          "file": "m_strings_orchestra_tense_01.mp3",
+          "mood": "TENSE",
+          "reasoning": "Tense orchestral strings for building confrontation, uneasy suspenseful quality, intensity 65 matches escalating social conflict",
+          "start_timing": "When Derek stops skateboard abruptly",
+          "avoid": "Playful music - conflict is real not lighthearted"
+        },
+        {
+          "file": "m_drums_orchestra_tense_01.mp3",
+          "mood": "TENSE",
+          "reasoning": "Rhythmic tension when Frankie cuts Derek off with car, urgent nervy quality",
+          "start_timing": "When car nearly hits Derek",
+          "avoid": "Love or uplifting moods inappropriate"
+        }
+      ]
+    },
+    {
+      "scene_type": "forest_riverbank_peace",
+      "script_scene": "EXT. FOREST RIVERBANKS - DAY (Derek and Drew smoking, before fight)",
+      "script_excerpt": "Peaceful moment at riverbank, friends talking, nature setting",
+      "music_selections": [
+        {
+          "file": "m_piano_strings_playful_01.mp3",
+          "mood": "PLAYFUL",
+          "reasoning": "Light whimsical tone for peaceful friend moment, cheeky quality fits casual weed smoking, low intensity 45 creates relaxed atmosphere",
+          "start_timing": "Opening scene establishing peace",
+          "avoid": "Tense or scary - scene is calm before storm"
+        },
+        {
+          "file": "m_strings_drums_groovy_01.mp3",
+          "mood": "GROOVY RETRO",
+          "reasoning": "Alternative groovy track for laid-back youth vibe, retro feel matches casual scene",
+          "start_timing": "During lighthearted conversation",
+          "avoid": "Dramatic music - moment is casual"
+        }
+      ]
+    },
+    {
+      "scene_type": "country_house_departure",
+      "script_scene": "EXT.COUNTRY HOUSE - FRONT YARD (Henry, Lucky, Stacy leaving urgently)",
+      "script_excerpt": "Urgent departure, soldier approaching, fleeing scene",
+      "music_selections": [
+        {
+          "file": "m_drums_orchestra_tense_01.mp3",
+          "mood": "TENSE",
+          "reasoning": "Orchestral tension with rhythm for urgent escape, suspenseful quality, intensity 65 matches immediate danger",
+          "start_timing": "When Henry says 'we gotta make a move'",
+          "avoid": "Slow or playful music - scene is urgent"
+        },
+        {
+          "file": "m_horns_orchestra_tense_02.mp3",
+          "mood": "TENSE",
+          "reasoning": "Brass orchestra creates urgent military threat feeling",
+          "start_timing": "When heading to door urgently",
+          "avoid": "Love or uplifting moods inappropriate for danger"
+        },
+        {
+          "file": "m_strings_drums_dramatic_01.mp3",
+          "mood": "DRAMATIC",
+          "reasoning": "Rhythmic dramatic tension for chase/escape energy",
+          "start_timing": "As they exit house",
+          "avoid": "Sad music - scene is active not emotional"
+        }
+      ]
+    }
+  ],
+  "music_selection_rules": [
+    {
+      "rule": "Match scene type to mood examples",
+      "explanation": "Study the scene type classifications above. When you encounter a similar scene (confrontation, revelation, party, etc.), reference which music files were used in the examples."
+    },
+    {
+      "rule": "Consider intensity level vs dialogue",
+      "explanation": "Dialogue-heavy scenes need lower intensity (40-60). Action scenes can use higher intensity (70-85). Never let music overwhelm dialogue."
+    },
+    {
+      "rule": "Timing is critical",
+      "explanation": "Music should start 2-5 seconds BEFORE emotional peak or action begins. Don't wait until the moment - build anticipation."
+    },
+    {
+      "rule": "Avoid contradicting scene mood",
+      "explanation": "Never use uplifting music in tragic scenes, playful music in dangerous scenes, or scary music in romantic scenes. Match the emotional reality."
     }
   ],
   "ambience_rules": [
     {
       "rule": "ONLY match scene header location, NOT mood or dialogue",
-      "examples": {
-        "correct": "INT. COFFEE SHOP - DAY → cafe ambience",
-        "incorrect": "Character mentions ocean → ocean ambience (WRONG)"
-      }
+      "correct_example": "INT. COFFEE SHOP - DAY \u2192 cafe ambience",
+      "incorrect_example": "Character mentions ocean in dialogue \u2192 ocean ambience (WRONG - match header only)"
     },
     {
       "rule": "INT = indoor ambience, EXT = outdoor ambience",
-      "note": "Never select based on emotions or memories"
+      "explanation": "Never select based on emotions, memories, or what character is talking about. Only match the ACTUAL PHYSICAL LOCATION in the scene header."
+    },
+    {
+      "rule": "Generic interiors often need NO ambience",
+      "explanation": "Living rooms, bedrooms, kitchens do not need ambience unless specific keywords align with database (office phones, hospital PA, etc.)"
+    },
+    {
+      "rule": "Read description after scene header",
+      "explanation": "Description might contradict obvious choice. If description says 'bodies hit floor with debris', ignore 'office' in header and use no ambience."
+    },
+    {
+      "rule": "Combine files when necessary at 50% volume each",
+      "explanation": "Sometimes two ambience files needed for accuracy. Split volume between both files."
+    },
+    {
+      "rule": "Loop ambience for entire scene duration",
+      "explanation": "If ambience file shorter than scene, loop it until scene ends."
+    }
+  ],
+  "voice_selection_examples": [
+    {
+      "character_name": "DEREK",
+      "character_description": "African American male, 18, unpopular 'skater kid'",
+      "correct_voice_id": "DTKMou8ccj1ZaWGBiotd",
+      "label": "Male Teen",
+      "style": "African American",
+      "tone": "Stylish",
+      "reasoning": "Age 18 = Male Teen label required (NOT Male 20s to 30s). African American ethnicity requires African American style match. Stylish tone fits 'skater kid' personality.",
+      "common_mistakes_to_avoid": [
+        "WRONG: Using Male 20s to 30s voice for 18-year-old",
+        "WRONG: Using American style instead of African American style",
+        "WRONG: Ignoring character's youth and using older voice"
+      ]
+    },
+    {
+      "character_name": "DREW",
+      "character_description": "Caucasian male, 17, unpopular 'anime kid'",
+      "correct_voice_id": "Pb8RZcHs3ga4StE7wiPM",
+      "label": "Male Teen",
+      "style": "American",
+      "tone": "chill",
+      "reasoning": "Age 17 = Male Teen label required. Caucasian/American = American style. 'Anime kid' personality fits chill relaxed tone.",
+      "common_mistakes_to_avoid": [
+        "WRONG: Using Male 20s to 30s for 17-year-old",
+        "WRONG: Using energetic tone when character is laid-back"
+      ]
+    },
+    {
+      "character_name": "FRANKIE",
+      "character_description": "Caucasian male, 17, captain of football team, popular",
+      "correct_voice_id": "3XOBzXhnDY98yeWQ3GdM",
+      "label": "Male Teen",
+      "style": "American",
+      "tone": "Deep",
+      "reasoning": "Age 17 = Male Teen label. Football captain = deeper more authoritative teen voice. American style for Caucasian character.",
+      "common_mistakes_to_avoid": [
+        "WRONG: Using Male 20s to 30s - he's only 17",
+        "WRONG: Using breathy or soft tone - he's athletic/confident"
+      ]
+    },
+    {
+      "character_name": "JILL",
+      "character_description": "Female, 17, head cheerleader",
+      "correct_voice_id": "wrxvN1LZJIfL3HHvffqe",
+      "label": "Female Teen",
+      "style": "American",
+      "tone": "bubbly",
+      "reasoning": "Age 17 = Female Teen label required. Head cheerleader personality = bubbly energetic tone appropriate.",
+      "common_mistakes_to_avoid": [
+        "WRONG: Using Female 20s to 30s for 17-year-old",
+        "WRONG: Using calm/breathy tone when character is energetic cheerleader"
+      ]
+    },
+    {
+      "character_name": "CARRIE",
+      "character_description": "Female teenager, Derek's date",
+      "correct_voice_id": "T7eLpgAAhoXHlrNajG8v",
+      "label": "Female Teen",
+      "style": "American",
+      "tone": "calm",
+      "reasoning": "Teenage female = Female Teen label. No specific personality traits = calm neutral teen voice appropriate.",
+      "common_mistakes_to_avoid": [
+        "WRONG: Using Female 20s to 30s when script specifies teenager"
+      ]
+    },
+    {
+      "character_name": "DAN",
+      "character_description": "Male teenager, part of Derek's friend group",
+      "correct_voice_id": "BFnAlAvxDrOEsXlGCLZ2",
+      "label": "Male Teen",
+      "style": "American",
+      "tone": "chill",
+      "reasoning": "Teenage male = Male Teen label. Friend group casual vibe = chill tone fits.",
+      "common_mistakes_to_avoid": [
+        "WRONG: Using Male 20s to 30s for teenage character"
+      ]
+    },
+    {
+      "character_name": "TRENT CUMMINGS",
+      "character_description": "African American male, ruggedly handsome, in his thirties, sophisticated",
+      "correct_voice_id": "mcuuWJIofmzgKEGk3EMA",
+      "gender": "Male",
+      "label": "Male 20s to 30s",
+      "style": "African American",
+      "tone": "Deep",
+      "reasoning": "Age 30s = Male 20s to 30s label. African American = African American style required. 'Ruggedly handsome' and sophisticated = deep authoritative tone.",
+      "common_mistakes_to_avoid": [
+        "WRONG: Using American style instead of African American",
+        "WRONG: Using Older Male - he's only 30s not 50s+",
+        "WRONG: Using energetic tone when character is sophisticated/serious"
+      ]
+    },
+    {
+      "character_name": "KURT",
+      "character_description": "Caucasian male, good looking playboy type, in his thirties",
+      "correct_voice_id": "MWYZAv88R6kW8dvZNtvU",
+      "label": "Male 20s to 30s",
+      "style": "American",
+      "tone": "Energetic",
+      "reasoning": "Age 30s = Male 20s to 30s label. Caucasian = American style. 'Playboy type' personality = energetic charming tone.",
+      "common_mistakes_to_avoid": [
+        "WRONG: Using calm tone for playboy character - needs energy",
+        "WRONG: Using Older Male when character is 30s"
+      ]
+    },
+    {
+      "character_name": "KELSEY",
+      "character_description": "Hispanic woman, naturally beautiful, in her thirties",
+      "correct_voice_id": "uYXf8XasLslADfZ2MB4u",
+      "label": "Female - 20s to 30s",
+      "style": "American",
+      "tone": "caring",
+      "reasoning": "Age 30s = Female 20s to 30s label. Hispanic/Latina = American style (no specific Hispanic option). Mother character = caring warm tone.",
+      "common_mistakes_to_avoid": [
+        "WRONG: Using Older Female - she's only 30s",
+        "WRONG: Using southern or polished tone when 'naturally beautiful' suggests warmth"
+      ]
+    },
+    {
+      "character_name": "DELILAH",
+      "character_description": "Female, 8 years old, pretty girl",
+      "correct_voice_id": "jLreTVzdmVFjzOZ4f2Jx",
+      "label": "Female Under 10",
+      "style": "American",
+      "tone": "soft",
+      "reasoning": "Age 8 = Female Under 10 label required. Young child = soft gentle tone appropriate.",
+      "common_mistakes_to_avoid": [
+        "WRONG: Using Female Teen for 8-year-old - age difference is critical",
+        "WRONG: Using Female 20s to 30s - completely wrong age range"
+      ]
+    },
+    {
+      "character_name": "LUCKY",
+      "character_description": "Caucasian male, ruggedly handsome, late twenties",
+      "correct_voice_id": "0I4LODkzfgylrMzbYiDf",
+      "label": "Male 20s to 30s",
+      "style": "American",
+      "tone": "Calm",
+      "reasoning": "Age late 20s = Male 20s to 30s label. Caucasian = American style. Character deals with emotional trauma = calm measured tone.",
+      "common_mistakes_to_avoid": [
+        "WRONG: Using Male Teen - he's late 20s not teenage",
+        "WRONG: Using energetic tone when character is dealing with grief"
+      ]
+    },
+    {
+      "character_name": "STACY",
+      "character_description": "Woman, pretty with edge, late twenties",
+      "correct_voice_id": "xZVrOjUURog02K298cjt",
+      "label": "Female - 20s to 30s",
+      "style": "American",
+      "tone": "polished",
+      "reasoning": "Age late 20s = Female 20s to 30s label. 'Pretty with edge' = polished confident tone, not soft or breathy.",
+      "common_mistakes_to_avoid": [
+        "WRONG: Using breathy soft tone when character has 'edge'",
+        "WRONG: Using Older Female - she's only late 20s"
+      ]
+    },
+    {
+      "character_name": "FLORENCE",
+      "character_description": "Woman, naturally pretty, in her twenties, nurse",
+      "correct_voice_id": "WAhoMTNdLdMoq1j3wf3I",
+      "label": "Female - 20s to 30s",
+      "style": "American",
+      "tone": "smooth",
+      "reasoning": "Age 20s = Female 20s to 30s label. Nurse profession = smooth caring professional tone.",
+      "common_mistakes_to_avoid": [
+        "WRONG: Using Female Teen - she's a professional nurse in her 20s",
+        "WRONG: Using southern accent without script indication"
+      ]
+    },
+    {
+      "character_name": "HENRY",
+      "character_description": "Male, scruffy bearded, mid-sixties",
+      "correct_voice_id": "Vv4DE9DtUpdmwjp7ucgc",
+      "label": "Older Male",
+      "style": "American",
+      "tone": "Wise",
+      "reasoning": "Age mid-60s = Older Male label required. Scruffy older character = wise weathered tone appropriate.",
+      "common_mistakes_to_avoid": [
+        "WRONG: Using Male 20s to 30s for 60s character - huge age difference",
+        "WRONG: Using energetic tone when character is older/weathered"
+      ]
+    },
+    {
+      "character_name": "MAMMA BEC",
+      "character_description": "African American woman, late fifties",
+      "correct_voice_id": "lIgS04i5awvulQMifXvy",
+      "label": "Older Female",
+      "style": "African American",
+      "tone": "Raspy",
+      "reasoning": "Age late 50s = Older Female label. African American = African American style required. Mature woman = raspy textured voice.",
+      "common_mistakes_to_avoid": [
+        "WRONG: Using Female 20s to 30s for 50s character",
+        "WRONG: Using American style instead of African American style",
+        "WRONG: Using soft or breathy tone when character is mature/strong"
+      ]
+    },
+    {
+      "character_name": "SHERIFF CARTER",
+      "character_description": "Male, fifty-something, southern Caucasian",
+      "correct_voice_id": "tp4cRlXymyN4yXXo3DYv",
+      "label": "Older Male",
+      "style": "American",
+      "tone": "Southern",
+      "reasoning": "Age 50s = Older Male label. Script explicitly states 'southern' = Southern tone required. Law enforcement authority figure.",
+      "common_mistakes_to_avoid": [
+        "WRONG: Using Male 20s to 30s - he's 50+",
+        "WRONG: Ignoring explicit 'southern' descriptor in script",
+        "WRONG: Using calm general American when southern specified"
+      ]
+    },
+    {
+      "character_name": "BRAD",
+      "character_description": "Male teenager, football teammate",
+      "correct_voice_id": "FIsP50cHv9JY47BkNVR7",
+      "label": "Male Teen",
+      "style": "American Midwestern",
+      "tone": "chill",
+      "reasoning": "Teenage male = Male Teen label. Football teammate = casual athletic teen, chill tone fits.",
+      "common_mistakes_to_avoid": [
+        "WRONG: Using Male 20s to 30s for high school student"
+      ]
+    },
+    {
+      "character_name": "BILLY",
+      "character_description": "Male teenager, football teammate",
+      "correct_voice_id": "ZhLVlARQZoYYz5GikrfB",
+      "label": "Male Teen",
+      "style": "American",
+      "tone": "breathy",
+      "reasoning": "Teenage male = Male Teen label. Secondary character = breathy natural teen voice.",
+      "common_mistakes_to_avoid": [
+        "WRONG: Using Male 20s to 30s for teenage character"
+      ]
+    },
+    {
+      "character_name": "DONNA CHANG",
+      "character_description": "Asian woman, speaking at press conference",
+      "correct_voice_id": "xZVrOjUURog02K298cjt",
+      "label": "Female - 20s to 30s",
+      "style": "American",
+      "tone": "polished",
+      "reasoning": "Adult professional woman = Female 20s to 30s label. Press conference = polished professional tone required. Asian ethnicity = American style (no specific Asian voice option available).",
+      "common_mistakes_to_avoid": [
+        "WRONG: Using breathy or soft tone for professional press conference",
+        "WRONG: Using southern accent without indication"
+      ]
+    },
+    {
+      "character_name": "NARRATOR / V.O.",
+      "character_description": "Various narration and voiceover moments",
+      "correct_voice_id": "uju3wxzG5OhpWcoi3SMy",
+      "label": "Narrator",
+      "style": "American",
+      "tone": "Calm",
+      "reasoning": "Voiceover narration = Narrator label specifically designed for this. Calm authoritative tone for story narration.",
+      "common_mistakes_to_avoid": [
+        "WRONG: Using regular character voice labels for V.O. narration",
+        "WRONG: Using character's voice for their own V.O. - narrator voice should be distinct"
+      ]
+    }
+  ],
+  "voice_selection_rules": [
+    {
+      "rule": "AGE DETERMINES LABEL - This is the most critical rule",
+      "age_mappings": [
+        "Under 10 years old = 'Male Under 10' or 'Female Under 10'",
+        "11-19 years old = 'Male Teen' or 'Female Teen'",
+        "20-39 years old = 'Male 20s to 30s' or 'Female - 20s to 30s'",
+        "40+ years old = 'Older Male' or 'Older Female'",
+        "Voiceover/Narration = 'Narrator'"
+      ],
+      "critical_mistakes": [
+        "NEVER use 'Male 20s to 30s' for 17-19 year olds - they are still teens",
+        "NEVER use 'Male Teen' for someone in their 20s",
+        "NEVER use 'Older Male' for someone in their 30s"
+      ]
+    },
+    {
+      "rule": "ETHNICITY MUST MATCH STYLE",
+      "style_mappings": [
+        "African American character = African American style voice",
+        "Caucasian character = American style voice",
+        "Hispanic/Latina character = American style (no specific option)",
+        "Asian character = American style (no specific option)",
+        "British character = British style"
+      ],
+      "critical_mistakes": [
+        "NEVER use American style for African American character",
+        "NEVER ignore explicit ethnicity descriptors in script"
+      ]
+    },
+    {
+      "rule": "TONE MATCHES PERSONALITY AND CONTEXT",
+      "tone_guidelines": [
+        "Athletic/confident characters = Deep or Energetic",
+        "Laid-back characters = Chill or Calm",
+        "Emotional/traumatic scenes = Calm or Soft",
+        "Professional contexts = Polished or Smooth",
+        "Authority figures = Deep or Stern or Wise",
+        "Young energetic = Bubbly or Playful or Energetic",
+        "Southern character = Southern tone"
+      ]
+    },
+    {
+      "rule": "GENDER MUST MATCH EXACTLY",
+      "explanation": "Male character = Male voice. Female character = Female voice. Never cross genders."
+    },
+    {
+      "rule": "NARRATOR IS A DISTINCT CATEGORY",
+      "explanation": "Voiceover narration (V.O.) uses Narrator label, not character labels. Even if character is narrating their own story, use Narrator voice for V.O. sections."
+    }
+  ],
+  "common_error_patterns": [
+    {
+      "error": "Using 'Male 20s to 30s' for 17-18 year old characters",
+      "why_its_wrong": "Teen voices sound distinctly different from adult voices. Age 17-18 are still developmental teenage years.",
+      "correct_approach": "Always use 'Male Teen' for ages 11-19, even if they're 18-19"
+    },
+    {
+      "error": "Ignoring ethnicity descriptors",
+      "why_its_wrong": "Script specifically describes character ethnicity for authenticity",
+      "correct_approach": "Match African American characters to African American style voices"
+    },
+    {
+      "error": "Using soft/breathy tones for confident characters",
+      "why_its_wrong": "Personality and tone must align",
+      "correct_approach": "Football captain = deep voice, not breathy. Cheerleader = bubbly, not calm."
+    },
+    {
+      "error": "Using character voice for their V.O. narration",
+      "why_its_wrong": "Narration needs distinct authoritative quality",
+      "correct_approach": "Use Narrator label for all V.O. sections, even if character is narrating"
     }
   ]
 }

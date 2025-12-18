@@ -19,6 +19,60 @@
     ]
   },
   {
+    "file": "ambience/a_basketball_game_crowd_applause_01.aac",
+    "group": "Recreational & Sports",
+    "id": "a_basketball_game_crowd_applause_01",
+    "intensity": 40,
+    "loopable": true,
+    "mood": [
+      "sports",
+      "crowds",
+      "cheering"
+    ],
+    "style": "general effect",
+    "tags": [
+      "recreational & sports",
+      "general",
+      "cinematic"
+    ]
+  },
+  {
+    "file": "ambience/a_car_cruising_fast_02.mp3",
+    "group": "Fast & Driving",
+    "id": "a_car_cruising_fast_02",
+    "intensity": 40,
+    "loopable": true,
+    "mood": [
+      "cruising",
+      "fast",
+      "driving"
+    ],
+    "style": "general effect",
+    "tags": [
+      "fast & driving",
+      "cruising",
+      "driving"
+    ]
+  },
+  {
+    "file": "ambience/a_sports_staduim_crowd_01.aac",
+    "group": "Sports & Stadium",
+    "id": "a_sports_staduim_crowd_01",
+    "intensity": 30,
+    "loopable": true,
+    "mood": [
+      "sports",
+      "stadium",
+      "crowds"
+    ],
+    "style": "general effect",
+    "tags": [
+      "sports & stadium",
+      "general",
+      "cinematic"
+    ]
+  },
+  {
     "file": "ambience/a_countryside_birds_01.mp3",
     "group": "Suburbs & Countryside",
     "id": "a_countryside_birds_01",

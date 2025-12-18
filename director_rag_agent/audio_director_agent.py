@@ -38,8 +38,15 @@ DEFAULT_MODEL = os.getenv("AUDIO_DIRECTOR_MODEL", "groq/llama-3.3-70b-versatile"
 KNOWLEDGE_SECTION = ""
 
 if AUDIO_KNOWLEDGE:
-    KNOWLEDGE_SECTION = """
-IMPORTANT: You have access to a comprehensive knowledge base with examples of correct audio selections from our catalog. Study these examples carefully before making any selections.
+   KNOWLEDGE_SECTION = """
+═══════════════════════════════════════════════════════════════════════════════
+MANDATORY KNOWLEDGE BASE - YOU MUST USE THESE EXACT PATTERNS
+═══════════════════════════════════════════════════════════════════════════════
+
+CRITICAL INSTRUCTION: The examples below are NOT suggestions - they are REQUIREMENTS.
+When you see a character/scene that matches an example, you MUST use the EXACT voice_id/file shown.
+
+**VOICE SELECTION EXAMPLES (USE THESE EXACT voice_ids):**
 
 **VOICE SELECTION EXAMPLES:**
 """
@@ -47,7 +54,23 @@ IMPORTANT: You have access to a comprehensive knowledge base with examples of co
     for ex in AUDIO_KNOWLEDGE.get('voice_selection_examples', [])[:15]:
         KNOWLEDGE_SECTION += f"- {ex['character_name']} ({ex['character_description']}): voice_id={ex['correct_voice_id']}, label={ex['label']}, style={ex['style']}, tone={ex['tone']}\n"
     
+ # CRITICAL VOICE RULES
     KNOWLEDGE_SECTION += """
+
+CRITICAL VOICE RULES - VIOLATIONS ARE ERRORS:
+- If character age is 17, 18, or 19 → MUST use "Male Teen" or "Female Teen" label
+- If character is African American → MUST use African American style voice
+- If you see "Derek, 18, African American" → MUST use voice_id: DTKMou8ccj1ZaWGBiotd
+- If you see "Drew, 17, Caucasian" → MUST use voice_id: Pb8RZcHs3ga4StE7wiPM
+- If you see "Frankie, 17" → MUST use voice_id: 3XOBzXhnDY98yeWQ3GdM
+
+INCORRECT EXAMPLES (DO NOT DO THIS):
+- Using "Male 20s to 30s" for a 17-year-old = WRONG
+- Using "American" style for African American character = WRONG
+
+"""   
+
+   KNOWLEDGE_SECTION += """
 **VOICE SELECTION RULES:**
 - Ages 11-19 (including 17, 18, 19) = Male Teen or Female Teen labels (NOT 20s to 30s!)
 - Ages 20-39 = Male 20s to 30s or Female 20s to 30s labels
@@ -69,14 +92,32 @@ IMPORTANT: You have access to a comprehensive knowledge base with examples of co
     # Add SFX examples
     for ex in AUDIO_KNOWLEDGE.get('sfx_examples', [])[:10]:
         KNOWLEDGE_SECTION += f"- Trigger: '{ex['trigger']}' -> {ex['sfx_file']} (Start: {ex.get('start_timing', 'immediately')}, Duration: {ex.get('duration', '2-3s')})\n"
-    
+    KNOWLEDGE_SECTION += """
+
+SFX RULE - STRICTLY ENFORCED:
+- ONLY add SFX if the action is CAPITALIZED in the script or explicitly violent
+- "Door SLAMS" = ADD SFX
+- "he walks in" = NO SFX
+- "crashes violently" = ADD SFX
+- "she enters" = NO SFX
+
+"""
+
     KNOWLEDGE_SECTION += """
 **AMBIENCE EXAMPLES:**
 """
     # Add ambience examples
     for ex in AUDIO_KNOWLEDGE.get('ambience_examples', [])[:10]:
         KNOWLEDGE_SECTION += f"- {ex['scene_header']}: {ex['ambience_file']}\n"
-    
+    KNOWLEDGE_SECTION += """
+
+AMBIENCE RULE - STRICTLY ENFORCED:
+- ONLY match the scene header location (INT. FOREST, EXT. PARKING LOT, etc.)
+- DO NOT add ambience based on character dialogue or memories
+- Generic interiors (living room, bedroom) = NO ambience
+
+"""
+
     KNOWLEDGE_SECTION += "\n" + "="*79 + "\n\n"
 
 AUDIO_DIRECTOR_SYSTEM_PROMPT = KNOWLEDGE_SECTION + """You are an expert Audio Director and Sound Designer with decades of experience in film scoring and sound design. Your task is to analyze a Director JSON and select PRECISELY matched audio for each scene.

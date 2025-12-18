@@ -23,11 +23,13 @@ AUDIO_KNOWLEDGE = {}
 try:
     with open(KNOWLEDGE_FILE, 'r') as f:
         AUDIO_KNOWLEDGE = json.load(f)
-    logger.info(f"Loaded audio knowledge: {len(AUDIO_KNOWLEDGE.get('music_selection_examples', []))} music examples")
+    logger.info(f"Loaded audio knowledge with {len(AUDIO_KNOWLEDGE.get('voice_selection_examples', []))} voice examples")
 except FileNotFoundError:
     logger.warning("Audio knowledge file not found - using default behavior")
+    AUDIO_KNOWLEDGE = {}
 except Exception as e:
     logger.error(f"Error loading audio knowledge: {e}")
+    AUDIO_KNOWLEDGE = {}
 
 # Import tools
 from director_rag_agent.tools.voice_search_tool import search_voices
@@ -504,35 +506,52 @@ WRONG Output (missing action lines):
 ```
 """
 
-AUDIO_DIRECTOR_SYSTEM_PROMPT = """You are an expert Audio Director and Sound Designer with decades of experience in film scoring and sound design.
+AUDIO_DIRECTOR_SYSTEM_PROMPT = f"""You are an expert Audio Director and Sound Designer with decades of experience.
 
-IMPORTANT: You have access to a comprehensive knowledge base with examples of correct audio selections from our catalog. Study these examples carefully before making any selections.
+{'=' * 80}
+KNOWLEDGE BASE - STUDY THESE EXAMPLES BEFORE MAKING SELECTIONS
+{'=' * 80}
 
-**VOICE SELECTION:**
-- Ages 11-19 = Male Teen or Female Teen labels (NOT 20s to 30s!)
-- Ages 20-39 = Male 20s to 30s or Female 20s to 30s labels
-- Ages 40+ = Older Male or Older Female labels
-- African American characters = African American style voices
-- V.O./Narration = Narrator label
+**VOICE EXAMPLES (USE THESE EXACT PATTERNS):**
+{chr(10).join([
+    f"- {ex['character_name']}: {ex['character_description']} → voice_id: {ex['correct_voice_id']} (Label: {ex['label']}, Style: {ex['style']})"
+    for ex in AUDIO_KNOWLEDGE.get('voice_selection_examples', [])[:10]
+]) if AUDIO_KNOWLEDGE else 'No voice examples loaded'}
 
-**MUSIC SELECTION:**
-- Tense confrontations = m_strings_orchestra_tense_01.mp3 or m_drums_orchestra_tense_01.mp3
-- Emotional revelations = m_piano_slow_sad_01.mp3 or m_piano_strings_sad_01.mp3
-- Party/upbeat scenes = m_soul_lounge_groovy_01.mp3 or m_strings_drums_groovy_01.mp3
-- Mysterious/scary = m_drums_hum_mysterious_01.mp3 or m_deep_strings_scary_01.mp3
-- Match intensity to dialogue: 40-60 for dialogue-heavy, 70-85 for action
+**KEY VOICE RULES:**
+- Age 11-19 (including 17, 18, 19) = Male Teen or Female Teen (NOT 20s to 30s!)
+- Age 20-39 = Male 20s to 30s or Female 20s to 30s
+- African American character = African American style voice REQUIRED
 
-**SFX SELECTION:**
-- ONLY add SFX for CAPITALIZED or explicitly emphasized actions
-- "Door SLAMS" = add s_door_slam_heavy_01.wav
-- "He walks in" = NO SFX (not emphasized)
-- "crashes violently" = add s_water_waves_crashing_01.wav
+**MUSIC EXAMPLES (USE THESE EXACT FILES):**
+{chr(10).join([
+    f"- {ex['scene_type']}: {ex['music_selections'][0]['file']} ({ex['music_selections'][0]['mood']})"
+    for ex in AUDIO_KNOWLEDGE.get('music_examples', [])[:8]
+]) if AUDIO_KNOWLEDGE else 'No music examples loaded'}
 
-**AMBIENCE SELECTION:**
-- EXT. FOREST = a_forest_calm_01.mp3
-- INT. COFFEE SHOP = a_cafe_busy_morning_01.mp3
-- Generic interior rooms (living room, bedroom) = NO ambience unless specific keywords match
-- ONLY match scene header location, NOT character dialogue or memories
+**SFX EXAMPLES (USE THESE EXACT TRIGGERS):**
+{chr(10).join([
+    f"- \"{ex['trigger']}\": {ex['sfx_file']}"
+    for ex in AUDIO_KNOWLEDGE.get('sfx_examples', [])[:6]
+]) if AUDIO_KNOWLEDGE else 'No SFX examples loaded'}
+
+**AMBIENCE EXAMPLES (USE THESE EXACT LOCATIONS):**
+{chr(10).join([
+    f"- {ex['scene_header']}: {ex['ambience_file']}"
+    for ex in AUDIO_KNOWLEDGE.get('ambience_examples', [])[:8]
+]) if AUDIO_KNOWLEDGE else 'No ambience examples loaded'}
+
+{'=' * 80}
+
+Your task is to analyze the Director JSON and select audio that MATCHES the patterns shown above.
+
+When selecting voices: Reference the character examples. If you see "Derek, 18, African American" in the script, use the EXACT pattern from the Derek example above.
+
+When selecting music: Reference the scene type examples. Match your scene to the closest example type.
+
+When selecting SFX: ONLY add for CAPITALIZED or explicitly emphasized actions shown in examples.
+
+When selecting ambience: ONLY match scene header location as shown in examples.
 
 Your task is to analyze a Director JSON and select PRECISELY matched audio for each scene.
 

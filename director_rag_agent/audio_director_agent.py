@@ -9,6 +9,24 @@ import logging
 import json
 from typing import Dict, Any, List, Callable
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+DEFAULT_MODEL = os.getenv("AUDIO_DIRECTOR_MODEL", "groq/llama-3.3-70b-versatile")
+
+# Load audio selection knowledge base
+KNOWLEDGE_FILE = os.path.join(os.path.dirname(__file__), "knowledge", "audio_selection_knowledge.json")
+AUDIO_KNOWLEDGE = {}
+
+try:
+    with open(KNOWLEDGE_FILE, 'r') as f:
+        AUDIO_KNOWLEDGE = json.load(f)
+    logger.info(f"Loaded audio knowledge: {len(AUDIO_KNOWLEDGE.get('voice_selection_examples', []))} voice examples, {len(AUDIO_KNOWLEDGE.get('music_examples', []))} music examples")
+except FileNotFoundError:
+    logger.warning(f"Audio knowledge file not found at {KNOWLEDGE_FILE}")
+except Exception as e:
+    logger.error(f"Error loading audio knowledge: {e}")
+  
 from litellm import completion
 
 logging.basicConfig(level=logging.INFO)
@@ -16,7 +34,52 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_MODEL = os.getenv("AUDIO_DIRECTOR_MODEL", "groq/llama-3.3-70b-versatile")
 
-AUDIO_DIRECTOR_SYSTEM_PROMPT = """You are an expert Audio Director and Sound Designer with decades of experience in film scoring and sound design. Your task is to analyze a Director JSON and select PRECISELY matched audio for each scene.
+# Build system prompt with knowledge base
+KNOWLEDGE_SECTION = ""
+
+if AUDIO_KNOWLEDGE:
+    KNOWLEDGE_SECTION = """
+IMPORTANT: You have access to a comprehensive knowledge base with examples of correct audio selections from our catalog. Study these examples carefully before making any selections.
+
+**VOICE SELECTION EXAMPLES:**
+"""
+    # Add voice examples
+    for ex in AUDIO_KNOWLEDGE.get('voice_selection_examples', [])[:15]:
+        KNOWLEDGE_SECTION += f"- {ex['character_name']} ({ex['character_description']}): voice_id={ex['correct_voice_id']}, label={ex['label']}, style={ex['style']}, tone={ex['tone']}\n"
+    
+    KNOWLEDGE_SECTION += """
+**VOICE SELECTION RULES:**
+- Ages 11-19 (including 17, 18, 19) = Male Teen or Female Teen labels (NOT 20s to 30s!)
+- Ages 20-39 = Male 20s to 30s or Female 20s to 30s labels
+- Ages 40+ = Older Male or Older Female labels
+- African American characters = African American style voices (REQUIRED)
+- V.O./Narration = Narrator label
+
+**MUSIC SELECTION EXAMPLES:**
+"""
+    # Add music examples
+    for ex in AUDIO_KNOWLEDGE.get('music_examples', [])[:10]:
+        if ex.get('music_selections'):
+            sel = ex['music_selections'][0]
+            KNOWLEDGE_SECTION += f"- {ex['scene_type']}: {sel['file']} (Mood: {sel['mood']}, Start: {sel.get('start_timing', 'scene start')})\n"
+    
+    KNOWLEDGE_SECTION += """
+**SFX EXAMPLES:**
+"""
+    # Add SFX examples
+    for ex in AUDIO_KNOWLEDGE.get('sfx_examples', [])[:10]:
+        KNOWLEDGE_SECTION += f"- Trigger: '{ex['trigger']}' -> {ex['sfx_file']} (Start: {ex.get('start_timing', 'immediately')}, Duration: {ex.get('duration', '2-3s')})\n"
+    
+    KNOWLEDGE_SECTION += """
+**AMBIENCE EXAMPLES:**
+"""
+    # Add ambience examples
+    for ex in AUDIO_KNOWLEDGE.get('ambience_examples', [])[:10]:
+        KNOWLEDGE_SECTION += f"- {ex['scene_header']}: {ex['ambience_file']}\n"
+    
+    KNOWLEDGE_SECTION += "\n" + "="*79 + "\n\n"
+
+AUDIO_DIRECTOR_SYSTEM_PROMPT = KNOWLEDGE_SECTION + """You are an expert Audio Director and Sound Designer with decades of experience in film scoring and sound design. Your task is to analyze a Director JSON and select PRECISELY matched audio for each scene.
 
 ═══════════════════════════════════════════════════════════════════════════════
 PHASE 1: DEEP SCENE ANALYSIS (MANDATORY - DO THIS FIRST)

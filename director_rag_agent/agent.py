@@ -1076,7 +1076,7 @@ class LiteLLMAgent:
                 # Add assistant message with tool calls
                 messages.append(response_message)
                 
-               # Execute each tool call
+# Execute each tool call
 for tool_call in response_message.tool_calls:
     function_name = tool_call.function.name
     try:

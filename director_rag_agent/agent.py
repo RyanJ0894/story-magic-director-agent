@@ -1076,44 +1076,18 @@ class LiteLLMAgent:
                 # Add assistant message with tool calls
                 messages.append(response_message)
                 
-               # Execute each tool call
-for tool_call in response_message.tool_calls:
-    function_name = tool_call.function.name
-    try:
-        function_args = json.loads(tool_call.function.arguments)
-    except json.JSONDecodeError:
-        function_args = {}
-    
-    logger.info(f"[{self.name}] Calling tool: {function_name} with args: {function_args}")
-    
-    # Execute the tool
-    tool_result = self.tool_executor.execute(function_name, function_args)
-    
-    # FORCE CORRECT VOICE SELECTION - Override bad choices
-    if function_name == "search_voice" and tool_result.get('results'):
-        query_lower = function_args.get('query', '').lower()
-        
-        # Force Teen voices for 17-19 year olds
-        if any(age in query_lower for age in ['17', '18', '19', 'seventeen', 'eighteen', 'nineteen']):
-            logger.warning(f"Detected teen age in query: {query_lower}")
-            # Filter results to ONLY show Teen voices
-            tool_result['results'] = [
-                r for r in tool_result['results'] 
-                if 'teen' in r.get('label', '').lower()
-            ]
-            if tool_result['results']:
-                logger.info(f"Forced Teen voice filtering - {len(tool_result['results'])} results remain")
-        
-        # Force African American voices for African American characters
-        if 'african american' in query_lower or 'black' in query_lower:
-            logger.warning(f"Detected African American in query: {query_lower}")
-            # Filter to ONLY show African American style voices
-            tool_result['results'] = [
-                r for r in tool_result['results']
-                if 'african american' in r.get('style', '').lower()
-            ]
-            if tool_result['results']:
-                logger.info(f"Forced African American style filtering - {len(tool_result['results'])} results remain")
+                # Execute each tool call
+                for tool_call in response_message.tool_calls:
+                    function_name = tool_call.function.name
+                    try:
+                        function_args = json.loads(tool_call.function.arguments)
+                    except json.JSONDecodeError:
+                        function_args = {}
+                    
+                    logger.info(f"[{self.name}] Calling tool: {function_name} with args: {function_args}")
+                    
+                    # Execute the tool
+                    tool_result = self.tool_executor.execute(function_name, function_args)
                     
                     # Add tool result to messages
                     messages.append({

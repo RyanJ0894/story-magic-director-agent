@@ -1090,7 +1090,7 @@ for tool_call in response_message.tool_calls:
     tool_result = self.tool_executor.execute(function_name, function_args)
     
     # FORCE CORRECT VOICE SELECTION - Override bad choices
-    if function_name == "search_voice" and tool_result.get('results'):
+    if function_name == "search_voices" and tool_result.get('results'):  # Note the 's'
         query_lower = function_args.get('query', '').lower()
         
         # Force Teen voices for 17-19 year olds

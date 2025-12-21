@@ -29,6 +29,36 @@ class DirectorJSONValidator:
     """Validates and auto-corrects Director JSON output."""
     
     def __init__(self, voice_catalog: List[Dict] = None):
+    """
+    Initialize validator.
+    
+    Args:
+        voice_catalog: List of available voices with metadata
+    """
+    if voice_catalog is None:
+        # Auto-load voice catalog from knowledge_bases
+        import os.path as path
+        catalog_path = path.join(
+            path.dirname(__file__), 
+            'knowledge_bases', 
+            'voice_embeddings_store',
+            'voices_metadata.json'
+        )
+        try:
+            with open(catalog_path, 'r') as f:
+                import json
+                self.voice_catalog = json.load(f)
+            logger.info(f"Loaded {len(self.voice_catalog)} voices for validation")
+        except FileNotFoundError:
+            logger.warning(f"Voice catalog not found at {catalog_path}")
+            self.voice_catalog = []
+        except Exception as e:
+            logger.error(f"Error loading voice catalog: {e}")
+            self.voice_catalog = []
+    else:
+        self.voice_catalog = voice_catalog
+    
+    self.errors = []
         """
         Initialize validator.
         

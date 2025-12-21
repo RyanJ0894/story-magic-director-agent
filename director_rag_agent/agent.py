@@ -300,20 +300,57 @@ Output text: "Interior/Exterior. Israel. United States Army Base. Medical Tent. 
 
 ### JSON STRUCTURE
 
+**CRITICAL: Character Metadata for Validation**
+
+For EACH character's FIRST appearance in the dialogue array, you MUST include their metadata extracted from the script. This allows the validation system to verify voice assignments are correct.
 ```json
-{{
+{
   "project_id": "xxx",
-  "scenes": [{{
+  "scenes": [{
     "scene_id": "scene_001",
     "mood": "description based on scene content",
     "intensity": 0.0-1.0,
     "dialogue": [
-      {{"line_id": "line_001", "character": "Narrator", "text": "expanded scene header", "voice_key": "narrator_voice_id"}},
-      {{"line_id": "line_002", "character": "CharacterName", "text": "dialogue without parentheticals", "voice_key": "character_voice_id"}}
+      {"line_id": "line_001", "character": "Narrator", "text": "expanded scene header", "voice_key": "narrator_voice_id"},
+      {
+        "line_id": "line_002", 
+        "character": "CharacterName", 
+        "text": "dialogue without parentheticals", 
+        "voice_key": "character_voice_id",
+        "character_age": 18,
+        "character_gender": "Male",
+        "character_ethnicity": "African American"
+      },
+      {"line_id": "line_003", "character": "CharacterName", "text": "next line", "voice_key": "character_voice_id"}
     ]
-  }}]
-}}
+  }]
+}
 ```
+
+**METADATA EXTRACTION RULES:**
+
+1. **Character Age** (`character_age`):
+   - Extract from character introduction in script
+   - Formats to look for: "Derek, 18", "Derek (18)", "18-year-old Derek", "Derek, a nineteen year old"
+   - Convert word numbers to digits: "nineteen" → 19, "seventeen" → 17
+   - If age not explicitly stated but implied (e.g., "high school junior" = ~17, "college freshman" = ~18), estimate appropriately
+   - Include this field ONLY on character's FIRST dialogue line
+
+2. **Character Gender** (`character_gender`):
+   - Extract from character introduction or context
+   - Values: "Male", "Female", or omit if unclear
+   - Include this field ONLY on character's FIRST dialogue line
+
+3. **Character Ethnicity** (`character_ethnicity`):
+   - Extract from character description
+   - Look for: "African American", "Caucasian", "Hispanic", "Asian", etc.
+   - Include this field ONLY on character's FIRST dialogue line
+   - If not mentioned, omit this field
+
+**IMPORTANT:** 
+- Add these metadata fields to the FIRST dialogue line for each character
+- Subsequent lines from the same character should NOT include these fields
+- Narrator lines never need these fields
 
 ### VOICE SEARCH TOOL
 

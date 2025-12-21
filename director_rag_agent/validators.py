@@ -7,6 +7,7 @@ to ensure consistency and reliability before audio generation.
 
 import logging
 import json
+import re
 from typing import Dict, Any, List, Tuple
 
 logger = logging.getLogger(__name__)
@@ -46,7 +47,6 @@ class DirectorJSONValidator:
             )
             try:
                 with open(catalog_path, 'r') as f:
-                    import json
                     self.voice_catalog = json.load(f)
                 logger.info(f"Loaded {len(self.voice_catalog)} voices for validation")
             except FileNotFoundError:
@@ -59,15 +59,6 @@ class DirectorJSONValidator:
             self.voice_catalog = voice_catalog
         
         self.errors = []
-        
-        """
-        Initialize validator.
-        
-        Args:
-            voice_catalog: List of available voices with metadata
-        """
-        self.voice_catalog = voice_catalog or []
-        self.errors = []
     
     def validate(self, director_json: Dict[str, Any]) -> Tuple[bool, List[ValidationError]]:
         """
@@ -78,14 +69,24 @@ class DirectorJSONValidator:
         """
         self.errors = []
         
+        logger.info("=== STARTING DIRECTOR JSON VALIDATION ===")
+        logger.info(f"Voice catalog size: {len(self.voice_catalog)}")
+        logger.info(f"Scenes to validate: {len(director_json.get('scenes', []))}")
+        
         # Extract character metadata from dialogue
         characters = self._extract_character_info(director_json)
+        
+        logger.info(f"Characters detected: {list(characters.keys())}")
+        for char_name, info in characters.items():
+            logger.info(f"  {char_name}: age={info.get('age')}, ethnicity={info.get('ethnicity')}, voice_id={info.get('voice_key')}")
         
         # Validate voice assignments
         self._validate_voice_assignments(director_json, characters)
         
         # Validate voice uniqueness
         self._validate_voice_uniqueness(director_json)
+        
+        logger.info(f"Validation complete: {len(self.errors)} errors found")
         
         return len(self.errors) == 0, self.errors
     
@@ -128,9 +129,10 @@ class DirectorJSONValidator:
         return corrected_json
     
     def _extract_character_info(self, director_json: Dict) -> Dict[str, Dict]:
-        """Extract character names, ages, ethnicities from dialogue lines."""
+        """Extract character names, ages, ethnicities from script content."""
         characters = {}
         
+        # First pass: Get all characters from dialogue
         for scene in director_json.get('scenes', []):
             for line in scene.get('dialogue', []):
                 char_name = line.get('character')
@@ -145,32 +147,100 @@ class DirectorJSONValidator:
                             'voice_key': line.get('voice_key')
                         }
         
+        # Second pass: Extract age/ethnicity from character descriptions
+        # Look through all text in the script for character introductions
+        for scene in director_json.get('scenes', []):
+            # Check scene description
+            scene_desc = scene.get('description', '')
+            self._extract_character_attributes(scene_desc, characters)
+            
+            # Check action lines
+            for line in scene.get('dialogue', []):
+                if line.get('character') == 'Narrator':
+                    text = line.get('text', '')
+                    self._extract_character_attributes(text, characters)
+        
         return characters
+    
+    def _extract_character_attributes(self, text: str, characters: Dict):
+        """Extract age and ethnicity from descriptive text."""
+        for char_name in characters.keys():
+            # Look for age mentions near character name
+            # Patterns: "Derek (17)" "Derek, 17," "17-year-old Derek" "Derek, a 19 year old"
+            age_patterns = [
+                rf'{char_name}\s*\((\d+)\)',  # Derek (17)
+                rf'{char_name},?\s*(\d+)[,\s]',  # Derek, 17,
+                rf'(\d+)[-\s]year[-\s]old\s+{char_name}',  # 17-year-old Derek
+                rf'{char_name},?\s*a\s*(\d+)\s*year[-\s]?old',  # Derek, a 17 year old
+            ]
+            
+            for pattern in age_patterns:
+                match = re.search(pattern, text, re.IGNORECASE)
+                if match:
+                    age = int(match.group(1))
+                    characters[char_name]['age'] = age
+                    logger.info(f"Extracted age {age} for {char_name} from text: {text[:100]}")
+                    break
+            
+            # Look for ethnicity mentions
+            if 'African American' in text and char_name in text:
+                characters[char_name]['ethnicity'] = 'African American'
+                logger.info(f"Extracted ethnicity 'African American' for {char_name}")
     
     def _validate_voice_assignments(self, director_json: Dict, characters: Dict):
         """Validate that voice assignments match character attributes."""
         
-        # Load voice catalog metadata
+        # Create voice lookup
         voice_metadata = {v['voice_id']: v for v in self.voice_catalog}
         
         for char_name, char_info in characters.items():
             voice_key = char_info.get('voice_key')
             
-            if not voice_key or voice_key not in voice_metadata:
+            if not voice_key:
+                logger.warning(f"No voice assigned to {char_name}")
+                continue
+            
+            if voice_key not in voice_metadata:
+                logger.warning(f"Voice {voice_key} not found in catalog for {char_name}")
                 continue
             
             voice = voice_metadata[voice_key]
+            voice_label = voice.get('label', '')
+            voice_style = voice.get('style', '')
             
-            # Check teen age characters (17-19)
-            # This would require parsing character descriptions from script
-            # For now, we'll check the voice label
-            if 'teen' in char_name.lower() or 'teenage' in char_name.lower():
-                if 'teen' not in voice.get('label', '').lower():
+            # Check teen age validation (17-19 years old)
+            char_age = char_info.get('age')
+            if char_age and 17 <= char_age <= 19:
+                # Teen character MUST have "Teen" in voice label
+                if 'Teen' not in voice_label:
+                    logger.error(f"VALIDATION ERROR: {char_name} is {char_age} years old but has voice '{voice_label}' (not Teen)")
                     self.errors.append(ValidationError(
                         error_type="TEEN_VOICE_WRONG_LABEL",
-                        message=f"Character '{char_name}' appears to be a teen but has non-teen voice",
+                        message=f"Character '{char_name}' is {char_age} years old but has voice label '{voice_label}' instead of 'Teen'",
                         location=f"character:{char_name}",
-                        fix_data={'character': char_name, 'current_voice': voice_key}
+                        fix_data={
+                            'character': char_name,
+                            'age': char_age,
+                            'current_voice': voice_key,
+                            'current_label': voice_label
+                        }
+                    ))
+            
+            # Check ethnicity matching
+            char_ethnicity = char_info.get('ethnicity')
+            if char_ethnicity == 'African American':
+                if voice_style != 'African American':
+                    logger.error(f"VALIDATION ERROR: {char_name} is African American but has voice style '{voice_style}'")
+                    self.errors.append(ValidationError(
+                        error_type="ETHNICITY_MISMATCH",
+                        message=f"Character '{char_name}' is African American but voice style is '{voice_style}'",
+                        location=f"character:{char_name}",
+                        fix_data={
+                            'character': char_name,
+                            'expected_style': 'African American',
+                            'current_voice': voice_key,
+                            'current_style': voice_style
+                        }
                     ))
     
     def _validate_voice_uniqueness(self, director_json: Dict):
@@ -194,6 +264,7 @@ class DirectorJSONValidator:
         # Find duplicates
         for voice_key, characters in voice_usage.items():
             if len(characters) > 1:
+                logger.error(f"VALIDATION ERROR: Voice {voice_key} assigned to multiple characters: {characters}")
                 self.errors.append(ValidationError(
                     error_type="DUPLICATE_VOICE",
                     message=f"Voice {voice_key} assigned to multiple characters: {characters}",
@@ -204,33 +275,105 @@ class DirectorJSONValidator:
     def _fix_teen_voice(self, director_json: Dict, error: ValidationError) -> Dict:
         """Fix teen character with wrong voice label."""
         char_name = error.fix_data['character']
+        char_age = error.fix_data.get('age')
+        current_voice = error.fix_data.get('current_voice')
         
-        # Find a teen voice from catalog
+        logger.info(f"Attempting to fix teen voice for {char_name} (age {char_age}, current voice: {current_voice})")
+        
+        # Find teen voices from catalog
+        # Get current voice to match gender if possible
+        current_voice_data = next((v for v in self.voice_catalog if v['voice_id'] == current_voice), None)
+        current_gender = current_voice_data.get('gender') if current_voice_data else None
+        
+        # Find teen voices, prefer same gender
         teen_voices = [
             v for v in self.voice_catalog 
-            if 'teen' in v.get('label', '').lower()
+            if 'Teen' in v.get('label', '')
         ]
         
         if not teen_voices:
-            logger.warning(f"No teen voices available to fix {char_name}")
+            logger.warning(f"No teen voices available in catalog to fix {char_name}")
             return director_json
         
-        # Select first available teen voice (could be more sophisticated)
-        new_voice = teen_voices[0]['voice_id']
+        # Try to match gender if known
+        if current_gender:
+            matching_gender = [v for v in teen_voices if v.get('gender') == current_gender]
+            if matching_gender:
+                teen_voices = matching_gender
+        
+        # Get already used voices to avoid duplicates
+        used_voices = set()
+        for scene in director_json.get('scenes', []):
+            for line in scene.get('dialogue', []):
+                if line.get('voice_key'):
+                    used_voices.add(line['voice_key'])
+        
+        # Find unused teen voice
+        new_voice = None
+        for voice in teen_voices:
+            if voice['voice_id'] not in used_voices or voice['voice_id'] == current_voice:
+                new_voice = voice['voice_id']
+                break
+        
+        if not new_voice:
+            # If all used, just take first teen voice
+            new_voice = teen_voices[0]['voice_id']
         
         # Update all instances of this character
+        updated_count = 0
         for scene in director_json.get('scenes', []):
             for line in scene.get('dialogue', []):
                 if line.get('character') == char_name:
                     line['voice_key'] = new_voice
+                    updated_count += 1
         
-        logger.info(f"Fixed {char_name}: assigned teen voice {new_voice}")
+        logger.info(f"✓ Fixed {char_name}: Changed voice from {current_voice} to {new_voice} ({updated_count} dialogue lines updated)")
         return director_json
     
     def _fix_ethnicity_mismatch(self, director_json: Dict, error: ValidationError) -> Dict:
         """Fix ethnicity mismatch between character and voice."""
-        # Implementation for ethnicity fixes
-        logger.info(f"Fixing ethnicity mismatch: {error.message}")
+        char_name = error.fix_data['character']
+        expected_style = error.fix_data['expected_style']
+        current_voice = error.fix_data.get('current_voice')
+        
+        logger.info(f"Attempting to fix ethnicity for {char_name} (needs {expected_style})")
+        
+        # Find voices matching ethnicity
+        matching_voices = [
+            v for v in self.voice_catalog 
+            if v.get('style') == expected_style
+        ]
+        
+        if not matching_voices:
+            logger.warning(f"No {expected_style} voices available to fix {char_name}")
+            return director_json
+        
+        # Get used voices
+        used_voices = set()
+        for scene in director_json.get('scenes', []):
+            for line in scene.get('dialogue', []):
+                if line.get('voice_key'):
+                    used_voices.add(line['voice_key'])
+        
+        # Find unused matching voice
+        new_voice = None
+        for voice in matching_voices:
+            if voice['voice_id'] not in used_voices:
+                new_voice = voice['voice_id']
+                break
+        
+        if not new_voice:
+            new_voice = matching_voices[0]['voice_id']
+        
+        # Update all instances
+        updated_count = 0
+        for scene in director_json.get('scenes', []):
+            for line in scene.get('dialogue', []):
+                if line.get('character') == char_name:
+                    line['voice_key'] = new_voice
+                    updated_count += 1
+        
+        logger.info(f"✓ Fixed {char_name}: Changed to {expected_style} voice {new_voice} ({updated_count} lines updated)")
         return director_json
     
     def _fix_duplicate_voice(self, director_json: Dict, error: ValidationError) -> Dict:
@@ -238,19 +381,23 @@ class DirectorJSONValidator:
         voice_key = error.fix_data['voice_key']
         characters = error.fix_data['characters']
         
+        logger.info(f"Fixing duplicate voice {voice_key} used by: {characters}")
+        
         # Keep first character with this voice, reassign others
-        for i, char_name in enumerate(characters[1:], 1):
-            # Find alternative voice from catalog
+        for char_name in characters[1:]:
+            # Find alternative voice
             alternative = self._find_alternative_voice(voice_key, director_json)
             
             if alternative:
                 # Update all instances
+                updated_count = 0
                 for scene in director_json.get('scenes', []):
                     for line in scene.get('dialogue', []):
                         if line.get('character') == char_name:
                             line['voice_key'] = alternative
+                            updated_count += 1
                 
-                logger.info(f"Fixed duplicate: {char_name} reassigned from {voice_key} to {alternative}")
+                logger.info(f"✓ Fixed duplicate: {char_name} reassigned from {voice_key} to {alternative} ({updated_count} lines)")
         
         return director_json
     

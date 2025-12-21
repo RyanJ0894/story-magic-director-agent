@@ -27,6 +27,7 @@ from director_rag_agent.agent import (
     SequentialAgent,
     create_director_pipeline
 )
+from director_rag_agent.validators import DirectorJSONValidator, SceneAudioValidator
 from director_rag_agent.tools.supabase_tool import save_to_supabase
 
 # --- Configuration ---
@@ -203,7 +204,7 @@ def validate_voice_consistency(director_data: Dict[str, Any]) -> tuple[bool, Lis
 @retry_sync(max_retries=MAX_RETRIES, delay=RETRY_DELAY_SECONDS)
 def run_director_pipeline_sync(project_id: str, script_text: str) -> Dict[str, Any]:
     """
-    Runs the director pipeline synchronously with retry logic.
+    Runs the director pipeline synchronously with retry logic and validation.
     This will be called in a thread pool from async context.
     """
     logger.info(f"Starting Director pipeline for project: {project_id}")
@@ -238,12 +239,66 @@ def run_director_pipeline_sync(project_id: str, script_text: str) -> Dict[str, A
     scene_audio = clean_json_string(audio_str)
     logger.info("clean audio director info")
     
+    # ========================================
+    # VALIDATION & AUTO-CORRECTION LAYER
+    # ========================================
     
-    # Combine outputs
+    # Validate Director JSON
+    try:
+        director_validator = DirectorJSONValidator()
+        is_valid, errors = director_validator.validate(director_json)
+        
+        if not is_valid:
+            logger.warning(f"Director JSON validation failed with {len(errors)} errors")
+            for error in errors:
+                logger.warning(f"  - {error.error_type}: {error.message}")
+            
+            # Auto-correct
+            logger.info("Attempting auto-correction of Director JSON...")
+            director_json = director_validator.auto_correct(director_json)
+            
+            # Re-validate
+            is_valid_after, remaining = director_validator.validate(director_json)
+            if is_valid_after:
+                logger.info("✓ Director JSON successfully corrected!")
+            else:
+                logger.warning(f"⚠ {len(remaining)} errors remain after auto-correction")
+        else:
+            logger.info("✓ Director JSON validation passed!")
+    except Exception as e:
+        logger.error(f"Error during Director JSON validation: {e}")
+    
+    # Validate Scene Audio JSON
+    try:
+        audio_validator = SceneAudioValidator()
+        is_valid, errors = audio_validator.validate(scene_audio, director_json)
+        
+        if not is_valid:
+            logger.warning(f"Scene Audio validation failed with {len(errors)} errors")
+            for error in errors:
+                logger.warning(f"  - {error.error_type}: {error.message}")
+            
+            # Auto-correct
+            logger.info("Attempting auto-correction of Scene Audio JSON...")
+            scene_audio = audio_validator.auto_correct(scene_audio, director_json)
+            
+            # Re-validate
+            is_valid_after, remaining = audio_validator.validate(scene_audio, director_json)
+            if is_valid_after:
+                logger.info("✓ Scene Audio JSON successfully corrected!")
+            else:
+                logger.warning(f"⚠ {len(remaining)} errors remain after auto-correction")
+        else:
+            logger.info("✓ Scene Audio validation passed!")
+    except Exception as e:
+        logger.error(f"Error during Scene Audio validation: {e}")
+    
+    # ========================================
+    # COMBINE VALIDATED OUTPUT
+    # ========================================
     combined_data = combine_output(director_json, scene_audio)
     
     return combined_data
-
 
 async def get_director_json(project_id: str, script_text: str) -> Dict[str, Any]:
     """

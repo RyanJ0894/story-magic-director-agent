@@ -39,6 +39,8 @@ from director_rag_agent.tools.audio_search_tool import (
     search_sfx
 )
 
+# Import validators
+from director_rag_agent.validators import DirectorJSONValidator, SceneAudioValidator
 # Configuration
 DEFAULT_MODEL = os.getenv("DIRECTOR_MODEL", "openai/gpt-4.1")
 AUDIO_DIRECTOR_MODEL = os.getenv("AUDIO_DIRECTOR_MODEL", "openai/gpt-4.1")
@@ -1202,10 +1204,9 @@ def create_director_pipeline(
 # For backward compatibility and easy access
 root_agent = create_director_pipeline()
 
-
 def process_script(project_id: str, script_text: str) -> Dict[str, Any]:
     """
-    Process a script through the full director pipeline.
+    Process a script through the full director pipeline with validation.
     
     Args:
         project_id: Unique identifier for the project
@@ -1213,8 +1214,9 @@ def process_script(project_id: str, script_text: str) -> Dict[str, Any]:
     
     Returns:
         Dictionary containing:
-        - director_json: Parsed script with voice assignments
-        - scene_audio_json: Audio selections for each scene
+        - director_json: Parsed script with voice assignments (validated & corrected)
+        - scene_audio_json: Audio selections for each scene (validated & corrected)
+        - validation_report: Summary of any issues found and fixed
     """
     input_data = json.dumps({
         "project_id": project_id,
@@ -1224,11 +1226,116 @@ def process_script(project_id: str, script_text: str) -> Dict[str, Any]:
     pipeline = create_director_pipeline()
     results = pipeline.run(input_data)
     
-    return {
-        "director_json": results.get("DirectorAgent", ""),
-        "scene_audio_json": results.get("AudioDirectorAgent", "")
+    # Get raw outputs
+    director_json_str = results.get("DirectorAgent", "")
+    scene_audio_json_str = results.get("AudioDirectorAgent", "")
+    
+    validation_report = {
+        "director_validation": {},
+        "audio_validation": {}
     }
-
+    
+    # ========================================
+    # PHASE 1: VALIDATE & CORRECT DIRECTOR JSON
+    # ========================================
+    try:
+        director_json = json.loads(director_json_str)
+        
+        # Initialize validator (auto-loads voice catalog)
+        director_validator = DirectorJSONValidator()
+        
+        # Validate
+        is_valid, errors = director_validator.validate(director_json)
+        
+        if not is_valid:
+            logger.warning(f"Director JSON validation failed with {len(errors)} errors")
+            validation_report["director_validation"]["errors_found"] = len(errors)
+            validation_report["director_validation"]["error_details"] = [
+                {"type": e.error_type, "message": e.message} for e in errors
+            ]
+            
+            # Auto-correct
+            logger.info("Attempting auto-correction of Director JSON...")
+            director_json = director_validator.auto_correct(director_json)
+            
+            # Re-validate after correction
+            is_valid_after, remaining_errors = director_validator.validate(director_json)
+            validation_report["director_validation"]["corrected"] = True
+            validation_report["director_validation"]["remaining_errors"] = len(remaining_errors)
+            
+            if is_valid_after:
+                logger.info("Director JSON successfully corrected!")
+            else:
+                logger.warning(f"{len(remaining_errors)} errors remain after auto-correction")
+        else:
+            logger.info("Director JSON validation passed!")
+            validation_report["director_validation"]["errors_found"] = 0
+        
+        # Convert back to string
+        director_json_str = json.dumps(director_json, indent=2)
+        
+    except json.JSONDecodeError as e:
+        logger.error(f"Failed to parse Director JSON: {e}")
+        validation_report["director_validation"]["parse_error"] = str(e)
+    except Exception as e:
+        logger.error(f"Error during Director JSON validation: {e}")
+        validation_report["director_validation"]["validation_error"] = str(e)
+    
+    # ========================================
+    # PHASE 2: VALIDATE & CORRECT SCENE AUDIO JSON
+    # ========================================
+    try:
+        scene_audio_json = json.loads(scene_audio_json_str)
+        director_json = json.loads(director_json_str)
+        
+        # Initialize validator
+        audio_validator = SceneAudioValidator()
+        
+        # Validate
+        is_valid, errors = audio_validator.validate(scene_audio_json, director_json)
+        
+        if not is_valid:
+            logger.warning(f"Scene Audio validation failed with {len(errors)} errors")
+            validation_report["audio_validation"]["errors_found"] = len(errors)
+            validation_report["audio_validation"]["error_details"] = [
+                {"type": e.error_type, "message": e.message} for e in errors
+            ]
+            
+            # Auto-correct
+            logger.info("Attempting auto-correction of Scene Audio JSON...")
+            scene_audio_json = audio_validator.auto_correct(scene_audio_json, director_json)
+            
+            # Re-validate after correction
+            is_valid_after, remaining_errors = audio_validator.validate(scene_audio_json, director_json)
+            validation_report["audio_validation"]["corrected"] = True
+            validation_report["audio_validation"]["remaining_errors"] = len(remaining_errors)
+            
+            if is_valid_after:
+                logger.info("Scene Audio JSON successfully corrected!")
+            else:
+                logger.warning(f"{len(remaining_errors)} errors remain after auto-correction")
+        else:
+            logger.info("Scene Audio validation passed!")
+            validation_report["audio_validation"]["errors_found"] = 0
+        
+        # Convert back to string
+        scene_audio_json_str = json.dumps(scene_audio_json, indent=2)
+        
+    except json.JSONDecodeError as e:
+        logger.error(f"Failed to parse Scene Audio JSON: {e}")
+        validation_report["audio_validation"]["parse_error"] = str(e)
+    except Exception as e:
+        logger.error(f"Error during Scene Audio validation: {e}")
+        validation_report["audio_validation"]["validation_error"] = str(e)
+    
+    # ========================================
+    # RETURN VALIDATED & CORRECTED RESULTS
+    # ========================================
+    return {
+        "director_json": director_json_str,
+        "scene_audio_json": scene_audio_json_str,
+        "validation_report": validation_report
+    }
 
 if __name__ == "__main__":
     # Example usage

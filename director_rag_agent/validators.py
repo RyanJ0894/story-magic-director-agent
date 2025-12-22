@@ -129,16 +129,17 @@ class DirectorJSONValidator:
         return corrected_json
     
     def _extract_character_info(self, director_json: Dict) -> Dict[str, Dict]:
-        """Extract character names, ages, ethnicities from script content."""
+        """Extract character names, ages, ethnicities from Director JSON metadata fields."""
         characters = {}
         
-        # First pass: Get all characters from dialogue
+        # Extract character info from dialogue lines with metadata
         for scene in director_json.get('scenes', []):
             for line in scene.get('dialogue', []):
                 char_name = line.get('character')
                 
                 if char_name and char_name != 'Narrator':
                     if char_name not in characters:
+                        # Initialize character entry
                         characters[char_name] = {
                             'name': char_name,
                             'age': None,
@@ -146,19 +147,20 @@ class DirectorJSONValidator:
                             'gender': None,
                             'voice_key': line.get('voice_key')
                         }
-        
-        # Second pass: Extract age/ethnicity from character descriptions
-        # Look through all text in the script for character introductions
-        for scene in director_json.get('scenes', []):
-            # Check scene description
-            scene_desc = scene.get('description', '')
-            self._extract_character_attributes(scene_desc, characters)
-            
-            # Check action lines
-            for line in scene.get('dialogue', []):
-                if line.get('character') == 'Narrator':
-                    text = line.get('text', '')
-                    self._extract_character_attributes(text, characters)
+                    
+                    # Extract metadata from this line if present
+                    # The AI Director includes these fields on the character's FIRST dialogue line
+                    if 'character_age' in line:
+                        characters[char_name]['age'] = line['character_age']
+                        logger.info(f"✓ Found age metadata: {char_name} = {line['character_age']} years old")
+                    
+                    if 'character_gender' in line:
+                        characters[char_name]['gender'] = line['character_gender']
+                        logger.info(f"✓ Found gender metadata: {char_name} = {line['character_gender']}")
+                    
+                    if 'character_ethnicity' in line:
+                        characters[char_name]['ethnicity'] = line['character_ethnicity']
+                        logger.info(f"✓ Found ethnicity metadata: {char_name} = {line['character_ethnicity']}")
         
         return characters
     

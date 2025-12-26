@@ -420,16 +420,48 @@ class DirectorJSONValidator:
         # If all voices used, return first available (fallback)
         return self.voice_catalog[0]['voice_id'] if self.voice_catalog else current_voice
 
-
 class SceneAudioValidator:
     """Validates and auto-corrects Scene Audio JSON output."""
     
     def __init__(self):
         self.errors = []
+        
+        # Load knowledge base for validation rules
+        self.knowledge = AUDIO_KNOWLEDGE
+        
+        # Extract location patterns from ambience examples
+        self.location_patterns = self._build_location_patterns()
+    
+    def _build_location_patterns(self) -> Dict[str, str]:
+        """Build location keyword to ambience file mapping from knowledge base."""
+        patterns = {}
+        
+        for example in self.knowledge.get('ambience_examples', []):
+            header = example['scene_header'].upper()
+            ambience = example['ambience_file']
+            
+            # Extract key location words
+            if 'FOREST' in header or 'WOODS' in header:
+                patterns['FOREST'] = 'a_forest_calm_01.mp3'
+                patterns['WOODS'] = 'a_forest_calm_01.mp3'
+            elif 'PARKING LOT' in header:
+                patterns['PARKING LOT'] = 'a_parking_lot_small_calm_crowds_01'
+            elif 'FRONT YARD' in header and 'COUNTRY' in header:
+                patterns['COUNTRY'] = 'a_countryside_birds_01'
+            elif 'CAFETERIA' in header:
+                patterns['CAFETERIA'] = 'a_public_spaces_people_mall_01'
+            elif 'ROOFTOP POOL' in header:
+                patterns['ROOFTOP POOL'] = 'a_city_streets_small_calm_crowds_01'
+            elif 'HOSPITAL' in header:
+                patterns['HOSPITAL'] = 'a_hospital_hallway_01'
+            elif 'MEDICAL TENT' in header or 'ARMY BASE' in header:
+                patterns['MILITARY'] = 'a_military_medical_tent_01'
+        
+        return patterns
     
     def validate(self, scene_audio_json: Dict[str, Any], director_json: Dict[str, Any]) -> Tuple[bool, List[ValidationError]]:
         """
-        Validate Scene Audio JSON.
+        Validate Scene Audio JSON against knowledge base rules.
         
         Args:
             scene_audio_json: Audio selections for scenes
@@ -440,13 +472,263 @@ class SceneAudioValidator:
         """
         self.errors = []
         
-        # Validate ambience matches scene headers
-        self._validate_ambience(scene_audio_json, director_json)
+        logger.info("=== STARTING SCENE AUDIO VALIDATION ===")
         
-        # Validate SFX only on explicit actions
-        self._validate_sfx(scene_audio_json, director_json)
+        # Validate each scene's audio selections
+        for scene_audio in scene_audio_json.get('scenes', []):
+            scene_id = scene_audio.get('scene_id')
+            
+            # Find corresponding scene in director JSON
+            director_scene = self._find_director_scene(director_json, scene_id)
+            if not director_scene:
+                logger.warning(f"Could not find director scene for {scene_id}")
+                continue
+            
+            logger.info(f"Validating audio for {scene_id}")
+            
+            # Validate music
+            self._validate_music(scene_audio, director_scene, scene_id)
+            
+            # Validate ambience
+            self._validate_ambience(scene_audio, director_scene, scene_id)
+            
+            # Validate SFX
+            self._validate_sfx(scene_audio, director_scene, scene_id)
+        
+        logger.info(f"Scene audio validation complete: {len(self.errors)} errors found")
         
         return len(self.errors) == 0, self.errors
+    
+    def _find_director_scene(self, director_json: Dict, scene_id: str) -> Optional[Dict]:
+        """Find the corresponding scene in Director JSON."""
+        for scene in director_json.get('scenes', []):
+            if scene.get('scene_id') == scene_id:
+                return scene
+        return None
+    
+    def _validate_music(self, scene_audio: Dict, director_scene: Dict, scene_id: str):
+        """Validate music selection for scene."""
+        music = scene_audio.get('music', [])
+        
+        # RULE 1: Every scene should have music
+        if not music or len(music) == 0:
+            logger.warning(f"No music selected for {scene_id}")
+            self.errors.append(ValidationError(
+                error_type="MISSING_MUSIC",
+                message=f"Scene {scene_id} has no music - every scene should have background music",
+                location=scene_id,
+                fix_data={'scene_id': scene_id, 'director_scene': director_scene}
+            ))
+            return
+        
+        # RULE 2: Check music file exists and mood is reasonable
+        music_file = music[0].get('file', '')
+        
+        # Extract scene mood from director JSON
+        scene_mood = director_scene.get('mood', '').lower()
+        scene_intensity = director_scene.get('intensity', 0.5)
+        
+        # Check for mood contradictions based on keywords
+        mood_keywords = {
+            'tense': ['tense', 'dramatic', 'scary', 'mysterious'],
+            'sad': ['sad', 'tragic', 'emotional', 'grief'],
+            'happy': ['uplifting', 'love', 'playful', 'groovy'],
+            'romantic': ['love', 'romantic'],
+            'scary': ['scary', 'mysterious', 'horror']
+        }
+        
+        # Check if music file mood contradicts scene mood
+        for scene_keyword, valid_music_moods in mood_keywords.items():
+            if scene_keyword in scene_mood:
+                # Check if music file contains any valid mood keyword
+                has_valid_mood = any(mood in music_file.lower() for mood in valid_music_moods)
+                
+                if not has_valid_mood:
+                    # Check for contradictions
+                    if scene_keyword == 'sad' and ('uplifting' in music_file.lower() or 'groovy' in music_file.lower()):
+                        logger.error(f"Music mood contradiction in {scene_id}: sad scene has {music_file}")
+                        self.errors.append(ValidationError(
+                            error_type="MUSIC_MOOD_MISMATCH",
+                            message=f"Sad scene has inappropriate music: {music_file}",
+                            location=scene_id,
+                            fix_data={'scene_id': scene_id, 'scene_mood': scene_mood, 'current_music': music_file}
+                        ))
+                    elif scene_keyword == 'tense' and ('playful' in music_file.lower() or 'groovy' in music_file.lower()):
+                        logger.error(f"Music mood contradiction in {scene_id}: tense scene has {music_file}")
+                        self.errors.append(ValidationError(
+                            error_type="MUSIC_MOOD_MISMATCH",
+                            message=f"Tense scene has inappropriate music: {music_file}",
+                            location=scene_id,
+                            fix_data={'scene_id': scene_id, 'scene_mood': scene_mood, 'current_music': music_file}
+                        ))
+        
+        logger.info(f"✓ Music validation passed for {scene_id}")
+    
+    def _validate_ambience(self, scene_audio: Dict, director_scene: Dict, scene_id: str):
+        """Validate ambience selection matches scene header location ONLY."""
+        ambience = scene_audio.get('ambience', [])
+        
+        # Get scene header from first narrator line
+        scene_header = self._extract_scene_header(director_scene)
+        
+        if not scene_header:
+            logger.warning(f"Could not extract scene header for {scene_id}")
+            return
+        
+        logger.info(f"Scene header: {scene_header}")
+        
+        # Determine if INT or EXT
+        is_interior = scene_header.upper().startswith('INT')
+        is_exterior = scene_header.upper().startswith('EXT')
+        
+        # Check if location matches any known patterns that should have ambience
+        should_have_ambience = False
+        expected_ambience_type = None
+        
+        header_upper = scene_header.upper()
+        for keyword, ambience_file in self.location_patterns.items():
+            if keyword in header_upper:
+                should_have_ambience = True
+                expected_ambience_type = keyword
+                break
+        
+        # RULE 1: Scenes with matchable locations should have ambience
+        if should_have_ambience and (not ambience or len(ambience) == 0):
+            logger.error(f"Missing ambience for {scene_id}: Header '{scene_header}' should have {expected_ambience_type} ambience")
+            self.errors.append(ValidationError(
+                error_type="MISSING_AMBIENCE",
+                message=f"Scene header '{scene_header}' should have ambience for {expected_ambience_type}",
+                location=scene_id,
+                fix_data={
+                    'scene_id': scene_id,
+                    'scene_header': scene_header,
+                    'expected_type': expected_ambience_type,
+                    'expected_file': self.location_patterns.get(expected_ambience_type)
+                }
+            ))
+            return
+        
+        # If ambience exists, validate it matches scene header
+        if ambience and len(ambience) > 0:
+            ambience_file = ambience[0].get('file', '')
+            
+            # RULE 2: INT scenes should NOT have outdoor ambience
+            outdoor_keywords = ['forest', 'street', 'city', 'park', 'countryside', 'ocean', 'beach']
+            indoor_keywords = ['hospital', 'cafe', 'office', 'mall', 'hallway']
+            
+            if is_interior:
+                has_outdoor_ambience = any(keyword in ambience_file.lower() for keyword in outdoor_keywords)
+                if has_outdoor_ambience:
+                    logger.error(f"INT/EXT mismatch in {scene_id}: Interior scene has outdoor ambience {ambience_file}")
+                    self.errors.append(ValidationError(
+                        error_type="AMBIENCE_INT_EXT_MISMATCH",
+                        message=f"Interior scene '{scene_header}' has outdoor ambience: {ambience_file}",
+                        location=scene_id,
+                        fix_data={'scene_id': scene_id, 'scene_header': scene_header, 'wrong_ambience': ambience_file}
+                    ))
+            
+            elif is_exterior:
+                has_indoor_ambience = any(keyword in ambience_file.lower() for keyword in indoor_keywords)
+                if has_indoor_ambience:
+                    logger.error(f"INT/EXT mismatch in {scene_id}: Exterior scene has indoor ambience {ambience_file}")
+                    self.errors.append(ValidationError(
+                        error_type="AMBIENCE_INT_EXT_MISMATCH",
+                        message=f"Exterior scene '{scene_header}' has indoor ambience: {ambience_file}",
+                        location=scene_id,
+                        fix_data={'scene_id': scene_id, 'scene_header': scene_header, 'wrong_ambience': ambience_file}
+                    ))
+        
+        if not self.errors or scene_id not in [e.location for e in self.errors]:
+            logger.info(f"✓ Ambience validation passed for {scene_id}")
+    
+    def _validate_sfx(self, scene_audio: Dict, director_scene: Dict, scene_id: str):
+        """Validate SFX only on explicit/capitalized actions."""
+        sfx_list = scene_audio.get('sfx', [])
+        
+        if not sfx_list:
+            logger.info(f"No SFX in {scene_id} - acceptable if no explicit actions")
+            return
+        
+        logger.info(f"Validating {len(sfx_list)} SFX in {scene_id}")
+        
+        # Get all dialogue/action text to search for trigger words
+        all_text = []
+        line_id_to_text = {}
+        
+        for line in director_scene.get('dialogue', []):
+            line_id = line.get('line_id')
+            text = line.get('text', '')
+            all_text.append(text)
+            line_id_to_text[line_id] = text
+        
+        combined_text = ' '.join(all_text)
+        
+        # Check each SFX
+        for sfx in sfx_list:
+            sfx_file = sfx.get('file', '')
+            start_at = sfx.get('start_at')
+            
+            # Try to find trigger text for this SFX
+            trigger_text = line_id_to_text.get(start_at, '')
+            
+            # Check for explicit trigger words from knowledge base
+            has_explicit_trigger = self._check_sfx_trigger(sfx_file, trigger_text, combined_text)
+            
+            if not has_explicit_trigger:
+                logger.warning(f"SFX in {scene_id} may not have explicit trigger: {sfx_file} at {start_at}")
+                self.errors.append(ValidationError(
+                    error_type="SFX_NO_EXPLICIT_TRIGGER",
+                    message=f"SFX {sfx_file} may not have explicit capitalized trigger in script",
+                    location=f"{scene_id}:{start_at}",
+                    fix_data={'scene_id': scene_id, 'sfx_file': sfx_file, 'line_id': start_at}
+                ))
+        
+        if not any(e.error_type == "SFX_NO_EXPLICIT_TRIGGER" and scene_id in e.location for e in self.errors):
+            logger.info(f"✓ SFX validation passed for {scene_id}")
+    
+    def _check_sfx_trigger(self, sfx_file: str, trigger_text: str, full_text: str) -> bool:
+        """Check if SFX has explicit trigger word in text."""
+        # Extract SFX type from filename
+        sfx_type = sfx_file.lower()
+        
+        # Define trigger words for common SFX types
+        trigger_patterns = {
+            'door': ['slam', 'slams', 'shut', 'opens', 'knock', 'knocks'],
+            'water': ['splash', 'crash', 'crashes', 'pour', 'rushing'],
+            'punch': ['punch', 'punches', 'hit', 'hits', 'slam'],
+            'fall': ['fall', 'falls', 'slam', 'crash', 'impact'],
+            'gun': ['shot', 'shoot', 'fire', 'gunshot'],
+            'car': ['door closes', 'engine', 'accelerate', 'screech']
+        }
+        
+        # Check if SFX type matches any trigger pattern
+        for sfx_keyword, triggers in trigger_patterns.items():
+            if sfx_keyword in sfx_type:
+                # Check if any trigger word appears in text (preferably capitalized)
+                for trigger in triggers:
+                    if trigger.upper() in full_text.upper():
+                        return True
+                    if trigger in trigger_text.lower():
+                        return True
+        
+        # If no specific pattern match, check for general capitalization emphasis
+        words = trigger_text.split()
+        has_caps = any(word.isupper() and len(word) > 2 for word in words)
+        
+        return has_caps
+    
+    def _extract_scene_header(self, director_scene: Dict) -> str:
+        """Extract scene header from first narrator line."""
+        dialogue = director_scene.get('dialogue', [])
+        
+        for line in dialogue:
+            if line.get('character') == 'Narrator':
+                text = line.get('text', '')
+                # Scene headers typically have INT/EXT
+                if text.upper().startswith('INT') or text.upper().startswith('EXT') or text.upper().startswith('I.E'):
+                    return text
+        
+        return ""
     
     def auto_correct(self, scene_audio_json: Dict[str, Any], director_json: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -463,33 +745,119 @@ class SceneAudioValidator:
         
         logger.warning(f"Found {len(errors)} scene audio errors - applying corrections")
         
-        corrected_json = scene_audio_json.copy()
+        corrected_json = json.loads(json.dumps(scene_audio_json))  # Deep copy
         
         for error in errors:
-            if error.error_type == "AMBIENCE_LOCATION_MISMATCH":
+            if error.error_type == "MISSING_AMBIENCE":
+                corrected_json = self._fix_missing_ambience(corrected_json, error)
+            
+            elif error.error_type == "AMBIENCE_INT_EXT_MISMATCH":
                 corrected_json = self._fix_ambience_mismatch(corrected_json, error)
             
-            elif error.error_type == "INVALID_SFX":
+            elif error.error_type == "SFX_NO_EXPLICIT_TRIGGER":
                 corrected_json = self._remove_invalid_sfx(corrected_json, error)
+            
+            elif error.error_type == "MISSING_MUSIC":
+                corrected_json = self._add_default_music(corrected_json, error)
+            
+            elif error.error_type == "MUSIC_MOOD_MISMATCH":
+                corrected_json = self._fix_music_mood(corrected_json, error)
+        
+        logger.info(f"Scene audio corrections applied")
         
         return corrected_json
     
-    def _validate_ambience(self, scene_audio_json: Dict, director_json: Dict):
-        """Validate ambience matches scene location (INT/EXT)."""
-        # Implementation for ambience validation
-        pass
-    
-    def _validate_sfx(self, scene_audio_json: Dict, director_json: Dict):
-        """Validate SFX only on capitalized/explicit actions."""
-        # Implementation for SFX validation
-        pass
+    def _fix_missing_ambience(self, scene_audio_json: Dict, error: ValidationError) -> Dict:
+        """Add missing ambience based on scene header."""
+        scene_id = error.fix_data['scene_id']
+        expected_file = error.fix_data.get('expected_file')
+        
+        if not expected_file:
+            logger.warning(f"Cannot fix missing ambience for {scene_id} - no expected file")
+            return scene_audio_json
+        
+        # Find the scene in audio JSON
+        for scene in scene_audio_json.get('scenes', []):
+            if scene.get('scene_id') == scene_id:
+                # Add ambience
+                if 'ambience' not in scene:
+                    scene['ambience'] = []
+                
+                scene['ambience'] = [{'file': expected_file}]
+                logger.info(f"✓ Added missing ambience to {scene_id}: {expected_file}")
+                break
+        
+        return scene_audio_json
     
     def _fix_ambience_mismatch(self, scene_audio_json: Dict, error: ValidationError) -> Dict:
-        """Fix ambience location mismatches."""
-        logger.info(f"Fixing ambience mismatch: {error.message}")
+        """Remove incorrect ambience."""
+        scene_id = error.fix_data['scene_id']
+        
+        # Find and remove incorrect ambience
+        for scene in scene_audio_json.get('scenes', []):
+            if scene.get('scene_id') == scene_id:
+                scene['ambience'] = []
+                logger.info(f"✓ Removed incorrect ambience from {scene_id}")
+                break
+        
         return scene_audio_json
     
     def _remove_invalid_sfx(self, scene_audio_json: Dict, error: ValidationError) -> Dict:
-        """Remove SFX that shouldn't be there."""
-        logger.info(f"Removing invalid SFX: {error.message}")
+        """Remove SFX without explicit triggers."""
+        scene_id = error.fix_data['scene_id']
+        sfx_file = error.fix_data['sfx_file']
+        
+        for scene in scene_audio_json.get('scenes', []):
+            if scene.get('scene_id') == scene_id:
+                # Remove the problematic SFX
+                scene['sfx'] = [s for s in scene.get('sfx', []) if s.get('file') != sfx_file]
+                logger.info(f"✓ Removed invalid SFX from {scene_id}: {sfx_file}")
+                break
+        
+        return scene_audio_json
+    
+    def _add_default_music(self, scene_audio_json: Dict, error: ValidationError) -> Dict:
+        """Add default music to scene without music."""
+        scene_id = error.fix_data['scene_id']
+        director_scene = error.fix_data['director_scene']
+        
+        # Determine appropriate default music based on scene mood
+        scene_mood = director_scene.get('mood', '').lower()
+        
+        default_music = 'm_piano_strings_dramatic_01.mp3'  # Safe default
+        
+        if 'tense' in scene_mood or 'conflict' in scene_mood:
+            default_music = 'm_strings_orchestra_tense_01.mp3'
+        elif 'sad' in scene_mood or 'emotional' in scene_mood:
+            default_music = 'm_piano_slow_sad_01.mp3'
+        elif 'happy' in scene_mood or 'uplifting' in scene_mood:
+            default_music = 'm_string_orchestra_uplifting_01.mp3'
+        
+        for scene in scene_audio_json.get('scenes', []):
+            if scene.get('scene_id') == scene_id:
+                scene['music'] = [{'file': f'music/{default_music}'}]
+                logger.info(f"✓ Added default music to {scene_id}: {default_music}")
+                break
+        
+        return scene_audio_json
+    
+    def _fix_music_mood(self, scene_audio_json: Dict, error: ValidationError) -> Dict:
+        """Fix music mood mismatch."""
+        scene_id = error.fix_data['scene_id']
+        scene_mood = error.fix_data['scene_mood']
+        
+        # Select appropriate music based on scene mood
+        replacement_music = 'm_piano_strings_dramatic_01.mp3'
+        
+        if 'sad' in scene_mood:
+            replacement_music = 'm_piano_slow_sad_01.mp3'
+        elif 'tense' in scene_mood:
+            replacement_music = 'm_strings_orchestra_tense_01.mp3'
+        
+        for scene in scene_audio_json.get('scenes', []):
+            if scene.get('scene_id') == scene_id:
+                scene['music'] = [{'file': f'music/{replacement_music}'}]
+                logger.info(f"✓ Fixed music mood for {scene_id}: {replacement_music}")
+                break
+        
         return scene_audio_json

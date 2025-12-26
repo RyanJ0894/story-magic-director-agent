@@ -15,6 +15,27 @@
   },
   {
     "label": "Older Male",
+    "voice_id": "AQRwYHxDbImo5kKo8DO5",
+    "gender": "Male",
+    "tone": "Calm",
+    "style": "Indian"
+  },
+  {
+    "label": "Older Male",
+    "voice_id": "l9KI3fSb2lQECGdtPlzg",
+    "gender": "Male",
+    "tone": "Calm",
+    "style": "British"
+  },
+  {
+    "label": "Older Male",
+    "voice_id": "tKWIR4jvsH64ikwy7OKw",
+    "gender": "Male",
+    "tone": "Calm",
+    "style": "British"
+  },
+  {
+    "label": "Older Male",
     "voice_id": "tp4cRlXymyN4yXXo3DYv",
     "gender": "Male",
     "tone": "Southern",

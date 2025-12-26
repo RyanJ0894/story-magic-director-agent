@@ -8,7 +8,7 @@ to ensure consistency and reliability before audio generation.
 import logging
 import json
 import re
-from typing import Dict, Any, List, Tuple
+from typing import Dict, Any, List, Tuple, Optional
 
 logger = logging.getLogger(__name__)
 

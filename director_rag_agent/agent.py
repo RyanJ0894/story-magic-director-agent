@@ -302,6 +302,8 @@ Output text: "Interior/Exterior. Israel. United States Army Base. Medical Tent. 
 
 **CRITICAL: Character Metadata for Validation**
 
+**WARNING: NEVER use placeholder text like "narrator_voice_id" or "character_voice_id" in your output. These are EXAMPLES ONLY. You MUST call search_voices() for EVERY character (including Narrator) and use the actual voice_id returned by the tool. Using placeholder text will cause production failures.**
+
 For EACH character's FIRST appearance in the dialogue array, you MUST include their metadata extracted from the script. This allows the validation system to verify voice assignments are correct.
 
 Example JSON output:

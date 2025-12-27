@@ -42,7 +42,7 @@ from director_rag_agent.tools.audio_search_tool import (
 # Import validators
 from director_rag_agent.validators import DirectorJSONValidator, SceneAudioValidator
 # Configuration
-DEFAULT_MODEL = os.getenv("DIRECTOR_MODEL", "openai/gpt-4.1")
+DEFAULT_MODEL = os.getenv("DIRECTOR_MODEL", "groq/llama-3.1-70b-versatile")
 AUDIO_DIRECTOR_MODEL = os.getenv("AUDIO_DIRECTOR_MODEL", "openai/gpt-4.1")
 
 # Script abbreviation expansion dictionary for audio playback

@@ -243,35 +243,7 @@
     "voice_id": "TkSyBjII8TcWww0CSouI",
     "gender": "Female",
     "tone": "soft",
-    "style": "American"
-  },
-  {
-    "label": "Male 20s to 30s",
-    "voice_id": "0I4LODkzfgylrMzbYiDf",
-    "gender": "Male",
-    "tone": "Calm",
-    "style": "American"     
-  },
-  {
-    "label": "Male 20s to 30s",
-    "voice_id": "mcuuWJIofmzgKEGk3EMA",
-    "gender": "Male",
-    "tone": "Deep",
-    "style": "African American"
-  },
-  {
-    "label": "Male 20s to 30s",
-    "voice_id": "1RVpBInY9YUYMLSUQReV",
-    "gender": "Male",
-    "tone": "Calm",
-    "style": "African American"
-  },
-  {
-    "label": "Male 20s to 30s",
-    "voice_id": "XvfwInXiPC6BcAjGWhmS",
-    "gender": "Male",
-    "tone": "Warm",
-    "style": "African American"
+    "style": "American"   
   },
   {
     "label": "Male 20s to 30s",
@@ -286,6 +258,118 @@
     "gender": "Male",
     "tone": "Smooth",
     "style": "British"
+  },
+  {
+    "label": "Male 20s to 30s",
+    "voice_id": "f8LQk3K2JqZZlqPDXdsB",
+    "gender": "Male",
+    "tone": "Energetic",
+    "style": "American"
+  },
+  {
+    "label": "Male 20s to 30s",
+    "voice_id": "yKmaB3Crpu4WvrZakKv8",
+    "gender": "Male",
+    "tone": "Smooth",
+    "style": "American"
+  },
+  {
+    "label": "Male 20s to 30s",
+    "voice_id": "Y4bGw3zc23IZQ9dQTCrO",
+    "gender": "Male",
+    "tone": "Energetic",
+    "style": "African American"
+  },
+  {
+    "label": "Male 20s to 30s",
+    "voice_id": "8Djbq2nupag9dYqtxnGD",
+    "gender": "Male",
+    "tone": "Smooth",
+    "style": "African American"   
+  },
+  {
+    "label": "Male 20s to 30s",
+    "voice_id": "VceVP2YXjk1vbiK3aVNv",
+    "gender": "Male",
+    "tone": "Energetic",
+    "style": "African American"
+  },
+  {
+    "label": "Male 20s to 30s",
+    "voice_id": "Dhb9HeouR33pKCuLn1Vz",
+    "gender": "Male",
+    "tone": "Smooth",
+    "style": "African American"
+  },
+  {
+    "label": "Male 20s to 30s",
+    "voice_id": "glPEmH1DUKKP7Bxdmpxz",
+    "gender": "Male",
+    "tone": "Energetic",
+    "style": "American"
+  },
+  {
+    "label": "Male 20s to 30s",
+    "voice_id": "R3wHLXqzy3UaQoiSkFth",
+    "gender": "Male",
+    "tone": "Smooth",
+    "style": "African American"   
+  },
+  {
+    "label": "Male 20s to 30s",
+    "voice_id": "C9zuj50DFemQHekyQ4rc",
+    "gender": "Male",
+    "tone": "Energetic",
+    "style": "African American"
+  },
+  {
+    "label": "Male 20s to 30s",
+    "voice_id": "GKENfjE5T9SchZnnzOcf",
+    "gender": "Male",
+    "tone": "Smooth",
+    "style": "African American"
+  },
+  {
+    "label": "Male 20s to 30s",
+    "voice_id": "zqEUml3RlSIesXcsQJMw",
+    "gender": "Male",
+    "tone": "Energetic",
+    "style": "American"
+  },
+  {
+    "label": "Male 20s to 30s",
+    "voice_id": "YSVYNMTOwDtmu1gTKZ9t",
+    "gender": "Male",
+    "tone": "Smooth",
+    "style": "American"
+  },
+  {
+    "label": "Male 20s to 30s",
+    "voice_id": "C0MQ6RpNe8UcMpJJRnf3",
+    "gender": "Male",
+    "tone": "Energetic",
+    "style": "American"
+  },
+  {
+    "label": "Male 20s to 30s",
+    "voice_id": "mmqvWAoIT6eC99ONwGu3",
+    "gender": "Male",
+    "tone": "Smooth",
+    "style": "American"
+  },
+  {
+    "label": "Male 20s to 30s",
+    "voice_id": "CKY0Fv5thD0ruZcdy19J",
+    "gender": "Male",
+    "tone": "Energetic",
+    "style": "African American"
+  },
+  {
+    "label": "Male 20s to 30s",
+    "voice_id": "czmo3poP4encpxvfbHzs",
+    "gender": "Male",
+    "tone": "Smooth",
+    "style": "British"   
   },
   {
     "label": "Male Teen",

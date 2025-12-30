@@ -1,5 +1,5 @@
 {
   "model_name": "all-MiniLM-L6-v2",
-  "num_voices": 68,
+  "num_voices": 79,
   "embedding_dim": 384
 }
